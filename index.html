@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tout pile ! — Le jeu des dates de l’histoire de France</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:#090f20;color:#f4f6ff;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0;min-width:320px;background:radial-gradient(circle at 90% -10%,#203777 0,transparent 37%),radial-gradient(circle at 0 80%,#16264d 0,transparent 42%),#090f20;min-height:100vh}
+button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.42}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #9db5ff;outline-offset:2px}
+main{max-width:1080px;margin:auto;padding:24px 18px 60px}.mast{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:28px}.logo{font-weight:900;font-size:24px;letter-spacing:-.05em}.logo b{color:#91aaff}.tag{font-size:13px;color:#b9c6e7;border:1px solid #31436b;border-radius:999px;padding:7px 12px}
+.screen{display:none}.screen.active{display:block}.panel{background:#151e36;border:1px solid #324163;border-radius:24px;box-shadow:0 22px 55px #0005;padding:clamp(20px,4vw,38px)}h1{font-size:clamp(29px,5vw,48px);line-height:1.09;letter-spacing:-.04em;margin:8px 0 15px}h2{font-size:clamp(25px,4vw,36px);line-height:1.14;letter-spacing:-.035em;margin:10px 0 22px}h3{font-size:19px;margin:0 0 14px}.muted{color:#b8c4df;line-height:1.5}.eyebrow{text-transform:uppercase;letter-spacing:.14em;color:#a4b8f8;font-size:12px;font-weight:800}.cols{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(260px,.85fr);gap:26px;align-items:start}.fields{display:grid;gap:18px}.field label{display:block;font-size:14px;font-weight:750;margin-bottom:8px}.field small{display:block;color:#aebcda;margin-top:7px}.field input,.field textarea,.field select{width:100%;color:#f4f6ff;background:#0d162c;border:1px solid #46577a;border-radius:12px;padding:12px 14px;min-height:48px}.field textarea{height:90px;resize:vertical}.options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.chip,.key,.part,.secondary,.primary{border-radius:13px;border:1px solid #485a81;background:#202d4b;color:#f5f7ff;min-height:48px;padding:10px 12px;transition:background .14s,transform .14s}.chip:hover,.key:hover,.part:hover,.secondary:hover{background:#30416c}.chip[aria-pressed=true],.part[aria-pressed=true],.key[aria-pressed=true]{background:#627cff;border-color:#91a6ff;color:#08142c}.primary{background:#798dff;border:1px solid #a6b4ff;color:#07112b;font-weight:850;padding:12px 22px}.primary:hover{background:#9baaff}.secondary{font-weight:700}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;align-items:center}.intro-card{background:#101a32;border:1px solid #34446d;border-radius:18px;padding:20px}.intro-card ol{padding-left:21px;line-height:1.8;color:#dae3fa}.intro-card li+li{margin-top:12px}.score-sample{font-size:30px;font-weight:900;color:#9db0ff}.counterline{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;color:#bdc9e7;font-size:14px}.event{font-size:clamp(26px,5vw,48px);font-weight:850;line-height:1.14;letter-spacing:-.035em;max-width:780px;margin:22px 0 30px}.center{max-width:650px;margin:0 auto}.ready{text-align:center;padding:55px 10px}.ready .avatar{display:grid;place-items:center;width:76px;height:76px;border-radius:24px;background:#304577;margin:0 auto 18px;font-size:33px}.ready p{max-width:490px;margin:0 auto 24px}.ready strong{color:#fff}.game-head{display:flex;justify-content:space-between;gap:15px;align-items:flex-start;flex-wrap:wrap}.time{font-variant-numeric:tabular-nums;font-size:28px;font-weight:900;color:#b7c6ff}.time.urgent{color:#ffadab}.meter{height:9px;border-radius:99px;background:#34415f;overflow:hidden;margin:16px 0 12px}.meter-fill{height:100%;width:100%;background:#8fa3ff;transition:width .1s linear}.meter-fill.urgent{background:#fb8687}.score-ceiling{text-align:right;font-variant-numeric:tabular-nums;color:#b9c8ef;font-size:14px}.score-ceiling strong{color:#f5f7ff}.parts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:20px 0}.part{text-align:left;display:flex;flex-direction:column;gap:5px}.part span{color:inherit;opacity:.75;font-size:13px}.part b{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.picker{background:#101a31;border:1px solid #334365;border-radius:20px;padding:16px}.picker p{margin:0 0 15px;font-weight:700}.grid{display:grid;gap:8px}.grid.year{grid-template-columns:repeat(3,minmax(0,1fr));max-width:350px;margin:auto}.grid.month{grid-template-columns:repeat(4,minmax(0,1fr))}.grid.day{grid-template-columns:repeat(7,minmax(0,1fr))}.key{font-weight:750;font-size:18px;min-width:0}.month .key{font-size:14px}.day .key{padding:8px 2px}.grid .key[data-soft]{font-size:14px;font-weight:650}.game-bottom{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px}.feedback{color:#ffb9b9;font-weight:700;min-height:1.4em}.pill{border:1px solid #4b619a;background:#273c74;color:#dce6ff;padding:5px 10px;border-radius:99px;font-size:13px;font-weight:800}.results-table{width:100%;border-collapse:collapse;margin-top:10px}.results-table th,.results-table td{padding:12px 8px;border-bottom:1px solid #344361;text-align:left}.results-table th{color:#afbede;font-size:13px}.results-table td:last-child,.results-table th:last-child{text-align:right;font-variant-numeric:tabular-nums}.results-table tr.winner{background:#293e64}.results-table .who{font-weight:750}.result-note{margin:12px 0;color:#b7c5e1}.answer{font-size:clamp(29px,6vw,52px);font-weight:900;color:#b3c1ff;letter-spacing:-.04em}.source{font-size:13px;color:#aebfe6}.source a{color:#aebfff}.board{display:flex;gap:7px;flex-wrap:wrap;margin-top:24px}.board span{background:#202e50;border:1px solid #455984;border-radius:99px;padding:8px 12px;color:#d9e3fa;font-variant-numeric:tabular-nums}.board b{color:white}.final-crown{font-size:45px;margin:4px 0 8px}.foot{text-align:center;color:#8999bb;font-size:12px;margin:22px auto;max-width:660px;line-height:1.45}
+@media(max-width:700px){.cols{grid-template-columns:1fr}.intro-card{display:none}.grid.month{grid-template-columns:repeat(3,minmax(0,1fr))}.grid.day{grid-template-columns:repeat(7,minmax(0,1fr))}.mast{margin-bottom:18px}}
+@media(max-width:420px){main{padding:12px 10px 40px}.panel{border-radius:17px;padding:17px}.tag{font-size:11px}.chip{font-size:13px;padding:8px 5px}.grid.day{grid-template-columns:repeat(5,minmax(0,1fr))}.grid.month{grid-template-columns:repeat(3,minmax(0,1fr))}.key{min-height:45px}.part{padding:9px 7px}.part b{font-size:17px}.results-table th,.results-table td{font-size:13px;padding:10px 4px}}
+</style>
+</head>
+<body>
+<main>
+  <div class="mast"><div class="logo">TOUT <b>PILE !</b></div><span class="tag">Histoire de France · version d’essai</span></div>
+  <section id="setup" class="screen active" aria-label="Préparer une partie">
+    <div class="panel cols"><div><span class="eyebrow">Le jeu des dates</span><h1>À combien de jours de l’Histoire ?</h1><p class="muted">Devine la date d’un événement. La proposition la plus proche gagne la manche ; la rapidité augmente ses points.</p>
+      <div class="fields">
+        <div class="field"><label for="players">Joueurs (un nom par ligne)</label><textarea id="players" maxlength="180">Joueur 1
+Joueur 2</textarea><small>Un seul nom pour jouer en solo. Jusqu’à 8 joueurs, sur le même appareil.</small></div>
+        <div class="field"><label>Précision des réponses</label><div class="options" id="mode-options" role="group" aria-label="Précision des réponses"><button type="button" class="chip" data-mode="year" aria-pressed="false">Année</button><button type="button" class="chip" data-mode="month" aria-pressed="false">Année + mois</button><button type="button" class="chip" data-mode="day" aria-pressed="true">Date complète</button></div></div>
+        <div class="field"><label for="round-count">Nombre de manches</label><select id="round-count"><option value="3">3 manches</option><option value="5" selected>5 manches</option><option value="8">8 manches</option><option value="12">12 manches</option></select><small id="bank-count"></small></div>
+        <div class="field"><label for="duration">Temps par joueur</label><select id="duration"><option value="15">15 secondes</option><option value="20" selected>20 secondes</option><option value="30">30 secondes</option></select></div>
+      </div><div class="actions"><button id="begin" class="primary" type="button">Commencer la partie</button></div><p class="feedback" id="setup-feedback" role="alert"></p>
+    </div><aside class="intro-card"><span class="eyebrow">Comment jouer</span><ol><li>Le joueur découvre l’événement quand il lance son chrono.</li><li>Il choisit l’année, puis le mois et le jour selon le mode choisi.</li><li>Les réponses sont révélées quand tout le monde a joué.</li></ol><div class="score-sample">7 000 pts</div><p class="muted">Tout pile : 7 000 points de précision. Chaque jour d’écart retire 1 point. Le joueur le plus proche reçoit en plus jusqu’à 3 000 points de vitesse.</p></aside></div>
+  </section>
+  <section id="ready" class="screen" aria-label="Passage au joueur suivant"><div class="panel center ready"><div class="avatar" aria-hidden="true">⌛</div><span class="eyebrow" id="ready-progress"></span><h2 id="ready-player"></h2><p class="muted">L’événement est caché. Prends la souris, puis lance la manche quand tu es prêt. Le chrono démarre à cet instant.</p><button id="reveal" class="primary" type="button">Découvrir l’événement</button></div></section>
+  <section id="game" class="screen" aria-label="Répondre à la question"><div class="panel center">
+    <div class="game-head"><div><span class="eyebrow" id="game-progress"></span><div class="muted" id="game-player"></div></div><div class="time" id="time" aria-label="Temps restant">20,0 s</div></div>
+    <div class="meter" role="progressbar" aria-label="Temps restant" aria-valuemin="0" aria-valuemax="20" aria-valuenow="20" id="meter"><div class="meter-fill" id="meter-fill"></div></div><div class="score-ceiling">Maximum si tout pile : <strong id="ceiling">10 000</strong> pts</div>
+    <div class="event" id="event"></div><div class="parts" id="parts"><button type="button" class="part" data-part="year" aria-pressed="true"><span>Année</span><b id="year-value">· · · ·</b></button><button type="button" class="part" data-part="month" aria-pressed="false"><span>Mois</span><b id="month-value">—</b></button><button type="button" class="part" data-part="day" aria-pressed="false"><span>Jour</span><b id="day-value">—</b></button></div>
+    <div class="picker"><p id="picker-label"></p><div class="grid year" id="picker-grid"></div></div>
+    <div class="game-bottom"><span class="muted" id="mode-hint"></span><button id="submit" class="primary" type="button" disabled>Valider ma réponse</button></div><div class="feedback" id="game-feedback" role="alert"></div>
+  </div></section>
+  <section id="reveal-screen" class="screen" aria-label="Résultats de la manche"><div class="panel"><span class="eyebrow" id="reveal-progress"></span><h2 id="reveal-event"></h2><div class="muted">La bonne réponse</div><div class="answer" id="answer"></div><p class="source" id="source"></p><h3>Résultats de la manche</h3><div style="overflow-x:auto"><table class="results-table"><thead><tr><th>Joueur</th><th>Proposition</th><th>Écart</th><th>Points</th></tr></thead><tbody id="results-body"></tbody></table></div><p class="result-note" id="result-note"></p><div class="board" id="board"></div><div class="actions"><button id="next" class="primary" type="button">Manche suivante</button><button class="secondary restart" type="button">Nouvelle partie</button></div></div></section>
+  <section id="final" class="screen" aria-label="Classement final"><div class="panel center"><div class="final-crown" aria-hidden="true">🏆</div><span class="eyebrow">Partie terminée</span><h2 id="final-title"></h2><div style="overflow-x:auto"><table class="results-table"><thead><tr><th>Place</th><th>Joueur</th><th>Points</th></tr></thead><tbody id="final-body"></tbody></table></div><div class="actions"><button class="primary restart" type="button">Rejouer</button></div></div></section>
+  <p class="foot">Pour comparer deux années, le jeu mesure l’écart entre leurs 1ers janvier ; pour deux mois, entre leurs premiers jours. Avant le XVIe siècle, seuls les événements dont la date est suffisamment connue apparaissent en mode « date complète ». Partie locale sur un seul appareil, à tour de rôle.</p>
+</main>
+<script>
+(()=>{'use strict';
+const MONTHS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+const EVENTS=[
+{title:'Édit de Caracalla accordant la citoyenneté romaine aux hommes libres de l’Empire, y compris en Gaule',date:[212,null,null],url:'https://catalogue.bnf.fr/ark:/12148/cb12515366g'},
+{title:'Bataille des Champs catalauniques en Gaule contre les Huns',date:[451,null,null],url:'https://actions-recherche.bnf.fr/bnf/anirw3.nsf/IX01/A2016000283_les-temps-merovingiens'},
+{title:'Victoire de Clovis à la bataille de Vouillé',date:[507,null,null],url:'https://catalogue.bnf.fr/ark:/12148/cb427528569'},
+{title:'Couronnement impérial de Charlemagne à Rome',date:[800,12,25],url:'https://expositions.bnf.fr/rouge/bande/grand/116.htm'},
+{title:'Traité de Verdun partageant l’Empire carolingien',date:[843,8,null],url:'https://catalogue.bnf.fr/ark:/12148/cb12011222r'},
+{title:'Élection d’Hugues Capet comme roi des Francs',date:[987,6,null],url:'https://catalogue.bnf.fr/ark:/12148/cb12011222r'},
+{title:'Victoire de Philippe Auguste à Bouvines',date:[1214,7,27],url:'https://catalogue.bnf.fr/ark:/12148/cb119864858'},
+{title:'Levée du siège d’Orléans par les forces de Jeanne d’Arc',date:[1429,5,8],url:'https://gallica.bnf.fr/ark:/12148/bpt6k5492922r.pdf'},
+{title:'Sacre de Charles VII à Reims',date:[1429,7,17],url:'https://gallica.bnf.fr/ark:/12148/bpt6k5492922r.pdf'},
+{title:'Exécution de Jeanne d’Arc à Rouen',date:[1431,5,30],url:'https://essentiels.bnf.fr/fr/article/6e6e48ab-6af5-4e58-8167-e2914a0b0098-guerre-cent-ans'},
+{title:'Victoire française à la bataille de Castillon',date:[1453,7,17],url:'https://catalogue.bnf.fr/ark:/12148/cb11943274h'},
+{title:'Ordonnance de Villers-Cotterêts sur la langue des actes de justice',date:[1539,null,null],url:'https://www.assemblee-nationale.fr/dyn/docs/PIONANR5L15B4003.raw'},
+{title:'Début du massacre de la Saint-Barthélemy à Paris',date:[1572,8,24],url:'https://catalogue.bnf.fr/ark:/12148/cb459357443'},
+{title:'Édit de Nantes signé par Henri IV',date:[1598,4,null],url:'https://www.assemblee-nationale.fr/histoire/eglise-etat/edit-nantes.asp'},
+{title:'Installation de la Cour de Louis XIV à Versailles',date:[1682,5,6],url:'https://www.chateauversailles.fr/decouvrir/histoire/grandes-dates/versailles-capitale-royaume'},
+{title:'Mort de Louis XIV à Versailles',date:[1715,9,1],url:'https://www.chateauversailles.fr/decouvrir/histoire/les-grandes-dates/mort-louis-xiv'},
+{title:'Ouverture des États généraux à Versailles',date:[1789,5,5],url:'https://www.assemblee-nationale.fr/dyn/histoire-et-patrimoine/revolution-francaise/assemblee-nationale-constituante'},
+{title:'Serment du Jeu de paume',date:[1789,6,20],url:'https://www2.assemblee-nationale.fr/decouvrir-l-assemblee/juniors/histoire/1789-1799-la-revolution-francaise'},
+{title:'Prise de la Bastille à Paris',date:[1789,7,14],url:'https://www.elysee.fr/la-presidence/la-fete-nationale-du-14-juillet'},
+{title:'Nuit de l’abolition des droits féodaux à l’Assemblée constituante',date:[1789,8,4],url:'https://www2.assemblee-nationale.fr/decouvrir-l-assemblee/juniors/histoire/1789-1799-la-revolution-francaise'},
+{title:'Adoption de la Déclaration des droits de l’homme et du citoyen',date:[1789,8,26],url:'https://www.elysee.fr/la-presidence/la-declaration-des-droits-de-l-homme-et-du-citoyen'},
+{title:'Adoption de la première Constitution française',date:[1791,9,3],url:'https://www2.assemblee-nationale.fr/decouvrir-l-assemblee/juniors/histoire/1789-1799-la-revolution-francaise'},
+{title:'Abolition de la royauté par la Convention nationale',date:[1792,9,21],url:'https://www.assemblee-nationale.fr/dyn/histoire-et-patrimoine/revolution-francaise/la-convention-nationale-et-la-fin-de-la-royaute'},
+{title:'Exécution du roi Louis XVI',date:[1793,1,21],url:'https://www2.assemblee-nationale.fr/decouvrir-l-assemblee/juniors/histoire/1789-1799-la-revolution-francaise'},
+{title:'Coup d’État du 18 Brumaire de Napoléon Bonaparte',date:[1799,11,9],url:'https://www2.assemblee-nationale.fr/decouvrir-l-assemblee/juniors/histoire/1789-1799-la-revolution-francaise'},
+{title:'Instauration du Premier Empire par sénatus-consulte',date:[1804,5,18],url:'https://www.assemblee-nationale.fr/dyn/histoire-et-patrimoine/consulat-et-premier-empire/du-consulat-a-l-empire'},
+{title:'Sacre de Napoléon Ier à Notre-Dame de Paris',date:[1804,12,2],url:'https://www.assemblee-nationale.fr/dyn/histoire-et-patrimoine/consulat-et-premier-empire/du-consulat-a-l-empire'},
+{title:'Fin de la monarchie de Juillet et abdication de Louis-Philippe',date:[1848,2,24],url:'https://www.assemblee-nationale.fr/gouv_parl/regimes.asp'},
+{title:'Proclamation de la IIIe République',date:[1870,9,4],url:'https://www.elysee.fr/la-presidence/la-fete-nationale-du-14-juillet'},
+{title:'Loi Jules Ferry rendant l’enseignement primaire public gratuit',date:[1881,6,16],url:'https://www.assemblee-nationale.fr/13/rapports/r0420.asp'},
+{title:'Loi rendant l’instruction primaire obligatoire et laïque',date:[1882,3,28],url:'https://www.assemblee-nationale.fr/13/rapports/r0420.asp'},
+{title:'Loi de séparation des Églises et de l’État',date:[1905,12,9],url:'https://www.assemblee-nationale.fr/dyn/histoire/separation-des-eglises-et-de-l-etat/1905-l-aboutissement-d-un-long-processus'},
+{title:'Début de la bataille de Verdun',date:[1916,2,21],url:'https://www.cheminsdememoire.gouv.fr/fr/1916-02-21-debut-de-la-bataille-de-verdun'},
+{title:'Signature de l’armistice mettant fin aux combats de la Première Guerre mondiale',date:[1918,11,11],url:'https://www.cheminsdememoire.gouv.fr/fr/memorial-de-l-armistice'},
+{title:'Signature du traité de Versailles après la Première Guerre mondiale',date:[1919,6,28],url:'https://www.cheminsdememoire.gouv.fr/fr/1919-06-28-signature-versailles-dans-la-galerie-des-glaces-du-traite-de-paix-lalsace-lorraine-e'},
+{title:'Signature des accords de Matignon lors du Front populaire',date:[1936,6,7],url:'https://www.vie-publique.fr/lettre_essentiel/37'},
+{title:'Appel radiodiffusé du général de Gaulle depuis Londres',date:[1940,6,18],url:'https://www.cheminsdememoire.gouv.fr/fr/18-juin-1940-commemoration-de-l-appel-du-general-de-gaulle'},
+{title:'Ordonnance accordant le droit de vote aux femmes françaises',date:[1944,4,21],url:'https://www.assemblee-nationale.fr/dyn/histoire-et-patrimoine/deuxieme-guerre-mondiale'},
+{title:'Débarquement allié en Normandie',date:[1944,6,6],url:'https://www.cheminsdememoire.gouv.fr/fr/revue/1944-operation-overlord'},
+{title:'Libération de Paris',date:[1944,8,25],url:'https://www.cheminsdememoire.gouv.fr/de/node/179'},
+{title:'Signature de l’acte définitif de la capitulation allemande à Berlin',date:[1945,5,8],url:'https://www.cheminsdememoire.gouv.fr/fr/8-mai-1945-le-stylo-de-la-capitulation'},
+{title:'Promulgation de la Constitution de la Ve République',date:[1958,10,4],url:'https://www.elysee.fr/la-presidence/les-institutions-de-la-cinquieme-republique'},
+{title:'Signature des accords d’Évian',date:[1962,3,18],url:'https://www.vie-publique.fr/parole-dexpert/284385-cetait-le-18-mars-1962-la-signature-des-accords-devian'},
+{title:'Élection de François Mitterrand à la présidence de la République',date:[1981,5,10],url:'https://www.vie-publique.fr/eclairage/24151-election-presidentielle-1981-ses-specificites'},
+{title:'Loi abolissant la peine de mort en France',date:[1981,10,9],url:'https://www.vie-publique.fr/discours/192675-declaration-de-m-raymond-forni-president-de-lassemblee-nationale-en'},
+{title:'Référendum approuvant le passage au quinquennat présidentiel',date:[2000,9,24],url:'https://www.vie-publique.fr/questions-reponses/290760-le-referendum-en-france-en-sept-questions'}
+,{title:'Appel à la première croisade lors du concile de Clermont',date:[1095,11,27],url:'https://nouveautes-editeurs.bnf.fr/accueil?id_declaration=10000001284927&titre_livre=Le_Chevalier_du_Pape'}
+,{title:'Arrestation des Templiers ordonnée par Philippe le Bel',date:[1307,10,13],url:'https://catalogue.bnf.fr/ark:/12148/cb46982049b'}
+,{title:'Début conventionnel de la guerre de Cent Ans',date:[1337,null,null],url:'https://essentiels.bnf.fr/fr/article/6e6e48ab-6af5-4e58-8167-e2914a0b0098-guerre-cent-ans'}
+,{title:'Défaite de la flotte française à la bataille de l’Écluse',date:[1340,6,24],url:'https://essentiels.bnf.fr/fr/livre-feuilleter/03e271f1-c313-4130-bb2f-f65edb3fde9d-jean-froissart-chroniques'}
+,{title:'Défaite française à la bataille de Crécy',date:[1346,8,26],url:'https://essentiels.bnf.fr/fr/livre-feuilleter/03e271f1-c313-4130-bb2f-f65edb3fde9d-jean-froissart-chroniques'}
+,{title:'Arrivée de la peste noire à Marseille',date:[1347,11,null],url:'https://essentiels.bnf.fr/fr/article/6e6e48ab-6af5-4e58-8167-e2914a0b0098-guerre-cent-ans'}
+,{title:'Défaite de Jean II le Bon à la bataille de Poitiers',date:[1356,9,19],url:'https://catalogue.bnf.fr/ark:/12148/cb12473591t'}
+,{title:'Défaite française à la bataille d’Azincourt',date:[1415,10,25],url:'https://essentiels.bnf.fr/fr/article/6e6e48ab-6af5-4e58-8167-e2914a0b0098-guerre-cent-ans'}
+,{title:'Défaite et capture de François Ier à la bataille de Pavie',date:[1525,2,24],url:'https://multimedia-ext.bnf.fr/pdf/FP_Marignan.pdf'}
+,{title:'Assassinat d’Henri IV par Ravaillac',date:[1610,5,14],url:'https://www.chateauversailles.fr/decouvrir/histoire/grands-personnages/louis-xiii'}
+,{title:'Édit de Fontainebleau révoquant l’édit de Nantes',date:[1685,10,18],url:'https://passerelles.essentiels.bnf.fr/fr/chronologie/article/86a8ea57-cf00-4c23-8d1a-939d0e519331-revocation-edit-nantes'}
+,{title:'Fête de la Fédération au Champ-de-Mars',date:[1790,7,14],url:'https://www.assemblee-nationale.fr/13/rap-info/i1262.asp'}
+,{title:'Arrestation de la famille royale à Varennes',date:[1791,6,21],url:'https://www.assemblee-nationale.fr/14/evenements/220-ans-republique.asp'}
+,{title:'Prise du palais des Tuileries lors de l’insurrection parisienne',date:[1792,8,10],url:'https://www.assemblee-nationale.fr/13/rap-info/i1262.asp'}
+,{title:'Arrestation de Robespierre le 9 thermidor',date:[1794,7,27],url:'https://passerelles.essentiels.bnf.fr/fr/chronologie/article/679b299d-3a63-4d85-8320-33eebf7023d1-terreur'}
+,{title:'Promulgation du Code civil des Français',date:[1804,3,21],url:'https://www.assemblee-nationale.fr/dyn/histoire-et-patrimoine/consulat-et-premier-empire/la-codification-juridique'}
+,{title:'Victoire de Napoléon à la bataille d’Austerlitz',date:[1805,12,2],url:'https://www.cheminsdememoire.gouv.fr/fr/chapitre-1-la-revolution-francaise-et-lempire-une-nouvelle-conception-de-la-nation'}
+,{title:'Défaite de Napoléon à la bataille de Waterloo',date:[1815,6,18],url:'https://catalogue.bnf.fr/ark:/12148/cb180990489'}
+,{title:'Décret instaurant le suffrage universel masculin',date:[1848,3,5],url:'https://www2.assemblee-nationale.fr/decouvrir-l-assemblee/histoire/le-suffrage-universel/la-republique-et-le-suffrage-universel/1848-la-deuxieme-republique-met-en-place-le-suffrage-universel-masculin'}
+,{title:'Coup d’État de Louis-Napoléon Bonaparte',date:[1851,12,2],url:'https://www2.assemblee-nationale.fr/decouvrir-l-assemblee/histoire/le-suffrage-universel/la-republique-et-le-suffrage-universel/1848-la-deuxieme-republique-met-en-place-le-suffrage-universel-masculin'}
+,{title:'Début de l’insurrection de la Commune de Paris',date:[1871,3,18],url:'https://www2.assemblee-nationale.fr/sycomore/fiche/8543'}
+,{title:'Adoption de l’amendement Wallon qui ancre la IIIe République',date:[1875,1,30],url:'https://www.senat.fr/connaitre-le-senat/lhistoire-du-senat/dossiers-dhistoire/la-naissance-du-senat-republicain/30-janvier-1875-la-republique-a-une-voix-pres.html'}
+,{title:'Loi autorisant la création des syndicats professionnels',date:[1884,3,21],url:'https://www.vie-publique.fr/files/rapport/pdf/285548.pdf'}
+,{title:'Loi consacrant la liberté d’association',date:[1901,7,1],url:'https://www.vie-publique.fr/files/rapport/pdf/285548.pdf'}
+,{title:'Début de la rafle du Vélodrome d’Hiver à Paris',date:[1942,7,16],url:'https://www.cheminsdememoire.gouv.fr/fr/revue/1942-un-tournant'}
+,{title:'Première réunion du Conseil national de la Résistance',date:[1943,5,27],url:'https://www.cheminsdememoire.gouv.fr/fr/la-france-combattante'}
+,{title:'Débarquement allié en Provence',date:[1944,8,15],url:'https://www.cheminsdememoire.gouv.fr/fr/15-aout-1944-operation-anvil-dragoon'}
+,{title:'Promulgation de la Constitution de la IVe République',date:[1946,10,27],url:'https://www.assemblee-nationale.fr/dyn/histoire-et-patrimoine/quatrieme-republique/la-constitution-de-1946-et-l-instauration-de-la-ive-republique'}
+,{title:'Chute du camp retranché français de Diên Biên Phu',date:[1954,5,7],url:'https://www.cheminsdememoire.gouv.fr/fr/le-monument-de-dien-bien-phu-vietnam'}
+,{title:'Signature des traités de Rome instituant la CEE et Euratom',date:[1957,3,25],url:'https://www.assemblee-nationale.fr/dyn/histoire-et-patrimoine/quatrieme-republique'}
+,{title:'Loi Veil relative à l’interruption volontaire de grossesse',date:[1975,1,17],url:'https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000000700230'}
+,{title:'Loi Informatique et Libertés',date:[1978,1,6],url:'https://www.cnil.fr/fr/le-cadre-national/la-loi-informatique-et-libertes'}
+,{title:'Loi de décentralisation relative aux droits et libertés des collectivités',date:[1982,3,2],url:'https://www.vie-publique.fr/eclairage/126857-construction-de-lorganisation-territoriale-de-la-france-chronologie'}
+];
+const $=id=>document.getElementById(id);const screens=['setup','ready','game','reveal-screen','final'];
+const fmt=n=>Math.round(n).toLocaleString('fr-FR');
+let mode='day',players=[],deck=[],round=0,turn=0,duration=20,entry,answers=[],clockId=null,startedAt=0,submitted=false;
+const modes={year:'Année',month:'Année + mois',day:'Date complète'};
+function show(name){screens.forEach(id=>$(id).classList.toggle('active',id===name));window.scrollTo({top:0,behavior:'instant'});}
+function shuffle(array){const copy=[...array];for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]];}return copy;}
+function eligible(event){return mode==='year'||(event.date[1]!==null&&(mode==='month'||event.date[2]!==null));}
+function period(year){return year<1000?0:year<1500?1:year<1789?2:year<1816?3:year<1914?4:5;}
+function selectEvents(count){const periods=Array.from({length:6},()=>[]);EVENTS.filter(eligible).forEach(event=>periods[period(event.date[0])].push(event));periods.forEach((items,i)=>periods[i]=shuffle(items));const selected=[];while(selected.length<count){let added=false;for(const i of shuffle([0,1,2,3,4,5])){if(periods[i].length&&selected.length<count){selected.push(periods[i].pop());added=true;}}if(!added)break;}return selected;}
+function updateBankCount(){$('bank-count').textContent=`${EVENTS.filter(eligible).length} événements disponibles, de 212 à 2000 selon la précision choisie.`;}
+function utc(y,m,d){const date=new Date(0);date.setUTCHours(12,0,0,0);date.setUTCFullYear(y,m-1,d);return date.getTime();}
+function daysInMonth(y,m){const date=new Date(utc(y,m+1,0));return date.getUTCDate();}
+function dateText(date,precision=mode){if(!date)return 'Sans réponse';const [y,m,d]=date;return precision==='year'?String(y):precision==='month'?`${MONTHS[m-1]} ${y}`:`${d} ${MONTHS[m-1]} ${y}`;}
+function distance(guess,actual){if(mode==='year')return Math.abs(utc(guess[0],1,1)-utc(actual[0],1,1))/86400000;if(mode==='month')return Math.abs(utc(guess[0],guess[1],1)-utc(actual[0],actual[1],1))/86400000;return Math.abs(utc(...guess)-utc(...actual))/86400000;}
+function unit(value){return `jour${Math.abs(value)>1?'s':''}`;}
+function resetEntry(){entry={year:'',month:null,day:null,part:'year'};submitted=false;$('game-feedback').textContent='';}
+function valid(){const y=Number(entry.year);return entry.year.length===4&&y>=1&&y<=2026&&(mode==='year'||entry.month!==null&&(mode==='month'||entry.day!==null));}
+function renderPicker(){const grid=$('picker-grid');grid.replaceChildren();const {part}=entry;
+ $('picker-label').textContent=part==='year'?'Choisis les 4 chiffres de l’année':part==='month'?'Choisis le mois':'Choisis le jour';
+ grid.className=`grid ${part}`;$('year-value').textContent=entry.year.padEnd(4,'·').split('').join(' ');$('month-value').textContent=entry.month?MONTHS[entry.month-1]:'—';$('day-value').textContent=entry.day||'—';
+ for(const button of document.querySelectorAll('.part')){const p=button.dataset.part;button.hidden=(mode==='year'&&p!=='year')||(mode==='month'&&p==='day');button.disabled=(p!=='year'&&entry.year.length!==4)||(p==='day'&&!entry.month);button.setAttribute('aria-pressed',String(part===p));}
+ $('parts').style.gridTemplateColumns=`repeat(${mode==='year'?1:mode==='month'?2:3},minmax(0,1fr))`;
+ let labels=part==='year'?['1','2','3','4','5','6','7','8','9','Effacer','0','⌫ Reculer']:part==='month'?MONTHS:Array.from({length:daysInMonth(Number(entry.year),entry.month)},(_,i)=>String(i+1));
+ labels.forEach((label,index)=>{const b=document.createElement('button');b.type='button';b.className='key';b.textContent=label;if(part==='year'&&index>=9)b.dataset.soft='true';if(part==='month')b.setAttribute('aria-pressed',String(entry.month===index+1));if(part==='day')b.setAttribute('aria-pressed',String(entry.day===index+1));b.addEventListener('click',()=>choose(part,label,index));grid.append(b);});
+ $('submit').disabled=!valid()||submitted;
+}
+function choose(part,label,index){if(submitted)return;
+ if(part==='year'){if(label==='Effacer')entry.year='';else if(label==='⌫ Reculer')entry.year=entry.year.slice(0,-1);else entry.year=entry.year.length<4?entry.year+label:label;entry.month=null;entry.day=null;if(entry.year.length===4&&Number(entry.year)>0&&Number(entry.year)<=2026&&mode!=='year')entry.part='month';}
+ else if(part==='month'){entry.month=index+1;entry.day=null;if(mode==='day')entry.part='day';}
+ else entry.day=index+1;
+ renderPicker();
+}
+function bonus(seconds){return Math.round(3000*Math.max(0,1-seconds/10));}
+function remaining(){return Math.max(0,duration-(performance.now()-startedAt)/1000);}
+function tick(){if(submitted)return;const left=remaining();const elapsed=duration-left;$('time').textContent=left.toFixed(1).replace('.',',')+' s';$('time').classList.toggle('urgent',left<=5);$('meter').setAttribute('aria-valuenow',left.toFixed(1));$('meter-fill').style.width=(100*left/duration)+'%';$('meter-fill').classList.toggle('urgent',left<=5);$('ceiling').textContent=fmt(7000+bonus(elapsed));if(left<=0)submit(true);}
+function ready(){resetEntry();$('ready-progress').textContent=`Manche ${round+1}/${deck.length} · ${modes[mode]}`;$('ready-player').textContent=`À toi, ${players[turn].name} !`;show('ready');}
+function launch(){if(!$('ready').classList.contains('active'))return;const event=deck[round];$('game-progress').textContent=`Manche ${round+1}/${deck.length}`;$('game-player').textContent=`${players[turn].name} · ${modes[mode]}`;$('event').textContent=event.title;$('mode-hint').textContent=`${turn+1}/${players.length} · ${duration} secondes`;$('meter').setAttribute('aria-valuemax',duration);renderPicker();show('game');startedAt=performance.now();tick();clockId=setInterval(tick,100);}
+function submit(timeout=false){if(submitted)return;if(!timeout&&!valid()){$('game-feedback').textContent='Complète la date avant de valider.';return;}submitted=true;clearInterval(clockId);clockId=null;const elapsed=timeout?duration:Math.min(duration,(performance.now()-startedAt)/1000);answers.push({player:turn,guess:timeout?null:[Number(entry.year),entry.month,entry.day],elapsed,bonus:timeout?0:bonus(elapsed)});turn++;if(turn<players.length)ready();else reveal();}
+function td(tr,text,cls){const c=document.createElement('td');c.textContent=text;if(cls)c.className=cls;tr.append(c);}
+function reveal(){const event=deck[round];const ranked=answers.map(a=>({...a,distance:a.guess?distance(a.guess,event.date):Infinity}));const best=Math.min(...ranked.map(x=>x.distance));
+ ranked.sort((a,b)=>a.distance-b.distance||a.elapsed-b.elapsed);const winner=ranked.find(a=>Number.isFinite(a.distance));
+ ranked.forEach(a=>{a.precision=Number.isFinite(a.distance)?Math.max(0,7000-a.distance):0;a.speed=a===winner?a.bonus:0;a.points=a.precision+a.speed;players[a.player].score+=a.points;});
+ $('reveal-progress').textContent=`Manche ${round+1}/${deck.length} · ${modes[mode]}`;$('reveal-event').textContent=event.title;$('answer').textContent=dateText(event.date,event.date[2]!==null?'day':event.date[1]!==null?'month':'year');$('source').replaceChildren('Date : ',(()=>{const a=document.createElement('a');a.href=event.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='source historique';return a;})());
+ const body=$('results-body');body.replaceChildren();ranked.forEach(a=>{const row=document.createElement('tr');if(a===winner)row.className='winner';td(row,players[a.player].name,'who');td(row,dateText(a.guess));td(row,Number.isFinite(a.distance)?`${fmt(a.distance)} ${unit(a.distance)}`:'—');td(row,a.speed?`${fmt(a.points)} (${fmt(a.precision)} + ${fmt(a.speed)} vitesse)`:fmt(a.points));body.append(row);});
+ $('result-note').textContent=winner?`${players[winner.player].name} remporte la manche ${best===0?'avec un tout pile !':`à ${fmt(best)} ${unit(best)} près !`}`:'Personne n’a répondu à temps.';
+ const board=$('board');board.replaceChildren();[...players].sort((a,b)=>b.score-a.score).forEach(p=>{const pill=document.createElement('span');const name=document.createElement('b');name.textContent=p.name;pill.append(name,` · ${fmt(p.score)} pts`);board.append(pill);});$('next').textContent=round===deck.length-1?'Voir le classement final':'Manche suivante';show('reveal-screen');}
+function final(){const body=$('final-body');body.replaceChildren();const order=[...players].sort((a,b)=>b.score-a.score);order.forEach((p,i)=>{const row=document.createElement('tr');td(row,String(i+1));td(row,p.name,'who');td(row,fmt(p.score));body.append(row);});$('final-title').textContent=players.length===1?`Tu as marqué ${fmt(order[0].score)} points !`:`Victoire de ${order[0].name} !`;show('final');}
+$('mode-options').addEventListener('click',e=>{const b=e.target.closest('button[data-mode]');if(!b)return;mode=b.dataset.mode;document.querySelectorAll('[data-mode]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));updateBankCount();});
+$('begin').addEventListener('click',()=>{const names=$('players').value.split(/[\n,;]+/).map(x=>x.trim()).filter(Boolean);const unique=new Set(names.map(x=>x.toLocaleLowerCase('fr')));if(names.length<1||names.length>8||unique.size!==names.length){$('setup-feedback').textContent='Indique de 1 à 8 noms différents, un par ligne.';return;}$('setup-feedback').textContent='';players=names.map(name=>({name,score:0}));duration=Number($('duration').value);deck=selectEvents(Number($('round-count').value));round=0;turn=0;answers=[];ready();});
+$('reveal').addEventListener('click',launch);$('parts').addEventListener('click',e=>{const b=e.target.closest('button[data-part]');if(!b||b.disabled)return;entry.part=b.dataset.part;renderPicker();});$('submit').addEventListener('click',()=>submit(false));
+$('next').addEventListener('click',()=>{if(round>=deck.length-1){final();return;}round++;turn=0;answers=[];ready();});document.querySelectorAll('.restart').forEach(b=>b.addEventListener('click',()=>{clearInterval(clockId);clockId=null;show('setup');}));
+updateBankCount();
+})();
+</script>
+</body>
+</html>
