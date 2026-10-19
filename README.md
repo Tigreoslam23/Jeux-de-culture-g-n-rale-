@@ -14,9 +14,11 @@ Cette version est locale. Elle ne synchronise pas les réponses de plusieurs app
 
 ### Banque d’événements
 
-79 événements de 212 à 2000, chacun avec un lien vers sa source historique. Il y a 70 dates complètes, 4 dates connues au mois et 5 événements renseignés à l’année. Le jeu affiche le nombre utilisable selon le mode choisi.
+256 questions, de 58 av. J.-C. à 2024 : 92 dates complètes, 9 dates connues au mois et 155 événements jouables à l’année. Les 200 entrées de la [chronologie transmise](sources.html) sont prises en compte : 54 figuraient déjà dans le jeu, 146 ont été ajoutées, ainsi que 31 questions supplémentaires pour distinguer des faits regroupés sur une même ligne.
 
-Les données sont dans le tableau `EVENTS` au début du script de `index.html`. Chaque ligne contient un intitulé, une date `[année, mois, jour]` et une URL de source. Utiliser `null` pour un mois ou un jour non établi. Pour ajouter un événement, insérer une nouvelle entrée dans ce tableau avec un libellé sans ambiguïté et une source qui confirme la précision annoncée.
+Pour une année avant J.-C., cliquer sur « Avant J.-C. » dans le sélecteur, puis saisir quatre chiffres avec la souris : `0052` pour 52 av. J.-C. Les événements dont l’année est approximative sont indiqués « vers » et proposés uniquement en mode année.
+
+Les données sont dans le tableau `EVENTS` au début du script de `index.html`. Chaque ligne contient un intitulé, une date `[année, mois, jour]` et une URL. Utiliser `null` pour un mois ou un jour non établi et une année négative pour une année avant J.-C. Le lien « chronologie fournie » renvoie à la transcription du document remis ; il indique la provenance, sans tenir lieu de vérification indépendante. D’autres cartes renvoient directement à des sources historiques institutionnelles. Pour ajouter un événement, fournir si possible une source qui confirme la précision annoncée.
 
 ### Règles
 
@@ -26,6 +28,6 @@ Les données sont dans le tableau `EVENTS` au début du script de `index.html`. 
 - Le joueur le plus proche reçoit aussi un bonus de vitesse allant jusqu’à 3 000 points, qui décroît pendant les dix premières secondes. En cas d’égalité de distance, le plus rapide le reçoit.
 - En mode année, l’écart est mesuré entre les 1ers janvier. En mode mois, il est mesuré entre les premiers jours des mois.
 
-### Publication facultative avec GitHub Pages
+### Publication avec GitHub Pages
 
-Dans les réglages du dépôt, activer **Pages** avec la branche `main` et le dossier racine `/`. Le jeu sera alors accessible à l’adresse de Pages du dépôt. L’activation de Pages est une opération distincte du dépôt des fichiers.
+Le dépôt est configuré pour publier la branche `main`, dossier racine `/`. Le jeu est accessible à l’adresse `https://tigreoslam23.github.io/Jeux-de-culture-g-n-rale-/` lorsque GitHub Pages a terminé le déploiement.
