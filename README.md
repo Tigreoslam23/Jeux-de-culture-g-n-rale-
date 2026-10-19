@@ -18,14 +18,14 @@ L’événement arrive en dérapage (1,4 seconde), puis le chronomètre illustr�
 
 ### Score MASTER
 
-- Points du chrono : `arrondi(10000 − 250 × secondes)`, avec les secondes entre 0 et 20. La valeur retenue est celle de la **dernière validation**, même si le joueur attend ensuite la fin du chrono.
-- Chaque mauvaise proposition validée, y compris la première, produit une brique : **−200 points**. Une répétition consécutive de la même année n’est pas acceptée et ne coûte rien.
-- Écart absolu entre la dernière année proposée et la bonne année. Pour un écart de 1 à 20 ans : `5000 − 250 × écart`. Au-delà : 0 point de proximité.
+- Points du chrono : `arrondi(5000 + 15000 × (1 − secondes / 20)³)`, avec les secondes entre 0 et 20. La chute est rapide au début : 20 000 au départ, environ 11 328 à 5 s, 6 875 à 10 s et 5 000 à 20 s. La valeur retenue est celle de la **dernière validation**, même si le joueur attend ensuite la fin du chrono.
+- Chaque mauvaise proposition validée, y compris la première, produit une brique : **−500 points**. Une répétition consécutive de la même année n’est pas acceptée et ne coûte rien.
+- Écart absolu entre la dernière année proposée et la bonne année. Pour un écart de 1 à 10 ans : `5000 − 500 × écart`. Au-delà : 0 point de proximité.
 - Tout pile : **+5000 points**, à la place du bonus de proximité.
 - Total : `max(0, chrono − briques + proximité + bonus tout pile)`. Sans proposition validée : 0.
 - « Garder ma réponse » termine le tour avec la dernière proposition enregistrée. À l’expiration du chrono, cette dernière proposition est également conservée.
 
-Exemples : tout pile à 4 secondes sans brique = **14000 points** ; à un an près à 4 secondes avec une brique = **13550 points**. Les années avant J.-C. sont négatives dans le calcul de l’écart ; aucune année zéro ne peut être saisie.
+Exemples : tout pile à 4 secondes sans brique = **17680 points** ; à un an près à 4 secondes avec une brique = **16680 points**. Les années avant J.-C. sont négatives dans le calcul de l’écart ; aucune année zéro ne peut être saisie.
 
 ### Fichiers MASTER et personnalisation
 
@@ -37,7 +37,7 @@ Ouvrir `tout-pile-master.html` avec le dossier `master-assets/` à côté. Tout 
 - `master-assets/events.js` : copie intégrale des 256 événements et de leurs sources. Quelques titres donnant l’année sont reformulés uniquement pendant la question ; les données restent intactes.
 - `master-assets/coin.webp` et `stopwatch.webp` : illustrations originales générées pour le jeu. Le marteau est un dessin SVG animé dans le HTML.
 
-La réduction des animations du système est respectée. Le son est facultatif et désactivé par défaut. Souris, tactile ou clavier : chiffres, Entrée pour valider, Retour arrière pour corriger, Échap pour effacer, − / + pour changer d’ère.
+La réduction des animations du système est respectée. Le son est activé par défaut après le clic du joueur : fanfare de trompettes synthétisées pendant l’arrivée de l’événement, et « PAF ! » percussif avec le marteau. Le bouton Son permet de le couper à tout moment. Souris, tactile ou clavier : chiffres, Entrée pour valider, Retour arrière pour corriger, Échap pour effacer, − / + pour changer d’ère.
 
 Vérifications : `node tests/master.test.cjs` couvre le score, les 256 événements, les contrôles, les briques, les réponses au voisinage de l’échéance, les années avant J.-C., le mode de mouvement réduit et une partie complète à deux joueurs. Il s’agit de tests de logique avec simulation du DOM et du temps ; ils ne remplacent pas une validation visuelle dans un navigateur.
 

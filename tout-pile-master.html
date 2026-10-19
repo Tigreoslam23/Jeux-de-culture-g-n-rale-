@@ -9,14 +9,14 @@
   <link rel="icon" href="master-assets/coin.webp" type="image/webp">
   <link rel="stylesheet" href="master-assets/master.css">
   <script src="master-assets/events.js" defer></script>
-  <script src="master-assets/rules.js" defer></script>
-  <script src="master-assets/game.js" defer></script>
+  <script src="master-assets/rules.js?v=2" defer></script>
+  <script src="master-assets/game.js?v=2" defer></script>
 </head>
 <body>
 <div class="page-shell">
   <header class="masthead">
     <a class="brand" href="tout-pile-master.html" aria-label="TOUT PILE MASTER, accueil"><img src="master-assets/coin.webp" width="66" height="66" alt=""><span>TOUT PILE<small>MASTER</small></span></a>
-    <div class="header-actions"><span class="edition">LA BATAILLE DES ANNÉES</span><button id="sound" class="small-button" aria-pressed="false" title="Activer les effets sonores">Son : OFF</button><button id="help" class="small-button">Règles</button></div>
+    <div class="header-actions"><span class="edition">LA BATAILLE DES ANNÉES</span><button id="sound" class="small-button" aria-pressed="true" title="Désactiver les effets sonores">Son : ON</button><button id="help" class="small-button">Règles</button></div>
   </header>
 
   <main>
@@ -37,7 +37,7 @@
         <textarea id="players" rows="4" maxlength="180" spellcheck="false">Joueur 1
 Joueur 2</textarea>
         <div class="setup-row"><label for="round-count">Nombre de manches</label><select id="round-count"><option value="3">3 · Express</option><option value="5" selected>5 · Classique</option><option value="8">8 · Épique</option><option value="12">12 · Marathon</option></select></div>
-        <div class="rule-strip"><b>PLUS ? MOINS ?</b><span>Affine ta réponse. Chaque indice coûte <strong>200 pts</strong>.</span></div>
+        <div class="rule-strip"><b>PLUS ? MOINS ?</b><span>Affine ta réponse. Chaque indice coûte <strong>500 pts</strong>.</span></div>
         <p id="setup-error" class="error" role="alert"></p>
         <button id="begin" class="primary big">Que la partie commence <span>➜</span></button>
         <p class="quiet setup-note">Années uniquement · Souris, tactile ou clavier</p>
@@ -55,7 +55,7 @@ Joueur 2</textarea>
     <div class="arena">
       <div class="story-panel panel">
         <div class="instruments">
-          <div class="score-meter"><span>POINTS DU CHRONO</span><strong id="live-points" class="digital">10 000</strong><small>10 000 → 5 000</small></div>
+          <div class="score-meter"><span>POINTS DU CHRONO</span><strong id="live-points" class="digital">20 000</strong><small>20 000 → 5 000</small></div>
           <div class="stopwatch" id="watch"><img src="master-assets/stopwatch.webp" alt="" width="180" height="180"><div class="watch-face"><strong id="time" role="timer" aria-label="Temps restant">20.0</strong><span>SECONDES</span></div></div>
         </div>
         <div class="time-track" role="progressbar" id="time-progress" aria-label="Temps écoulé" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0"><div id="time-fill"></div></div>
@@ -95,7 +95,7 @@ Joueur 2</textarea>
   <footer><span>TOUT PILE MASTER <b>✦</b> L’histoire a du répondant.</span><a href="index.html">Jouer à TOUT PILE classique ↗</a></footer>
 </div>
 <div id="celebration" class="celebration" hidden aria-hidden="true"><div class="burst"></div><div class="celebration-text">TOUT<br><em>PILE !</em><small>+ 5 000 POINTS</small></div></div>
-<dialog id="rules-dialog" aria-labelledby="rules-heading"><button id="close-rules" class="dialog-close" aria-label="Fermer les règles">×</button><span class="eyebrow">LE PETIT MANUEL DU MASTER</span><h2 id="rules-heading">Une année. Plusieurs chances.</h2><p>Après l’arrivée de l’événement, tu as <b>20 secondes</b> pour saisir une année. Valide pour recevoir un indice : <b>PLUS</b> signifie plus tard dans l’histoire, <b>MOINS</b> signifie plus tôt.</p><p>Chaque mauvaise proposition crée une brique et coûte <b>200 points</b>. Ta <b>dernière proposition</b> remplace la précédente, même si elle est moins bonne. Tu peux cliquer sur « Garder ma réponse » pour terminer.</p><ul><li><b>Chrono :</b> de 10 000 à 5 000 points, soit −250 points par seconde. La valeur retenue est celle de ta dernière validation.</li><li><b>Briques :</b> −200 points par mauvaise proposition, y compris la première.</li><li><b>Proximité :</b> pour 1 à 20 ans d’écart, 5 000 − 250 × écart. Au-delà : 0.</li><li><b>Tout pile :</b> +5 000 points à la place du bonus de proximité ; la manche s’arrête immédiatement pour toi.</li></ul><p>Sans réponse, le score est nul. Le total ne descend pas sous zéro. Les années avant J.-C. sont négatives pour le calcul d’écart ; l’année zéro n’est pas proposée. Les dates approximatives visent une année de référence.</p><p>Les joueurs répondent chacun leur tour sur le même appareil. Les autres détournent le regard ; les scores et la bonne réponse sont partagés en fin de manche.</p></dialog>
+<dialog id="rules-dialog" aria-labelledby="rules-heading"><button id="close-rules" class="dialog-close" aria-label="Fermer les règles">×</button><span class="eyebrow">LE PETIT MANUEL DU MASTER</span><h2 id="rules-heading">Une année. Plusieurs chances.</h2><p>Après l’arrivée de l’événement, tu as <b>20 secondes</b> pour saisir une année. Valide pour recevoir un indice : <b>PLUS</b> signifie plus tard dans l’histoire, <b>MOINS</b> signifie plus tôt.</p><p>Chaque mauvaise proposition crée une brique et coûte <b>500 points</b>. Ta <b>dernière proposition</b> remplace la précédente, même si elle est moins bonne. Tu peux cliquer sur « Garder ma réponse » pour terminer.</p><ul><li><b>Chrono :</b> de 20 000 à 5 000 points, avec une chute rapide au début, puis plus douce (environ 11 328 à 5 s et 6 875 à 10 s). La valeur retenue est celle de ta dernière validation.</li><li><b>Briques :</b> −500 points par mauvaise proposition, y compris la première.</li><li><b>Proximité :</b> pour 1 à 10 ans d’écart, 5 000 − 500 × écart. Au-delà : 0.</li><li><b>Tout pile :</b> +5 000 points à la place du bonus de proximité ; la manche s’arrête immédiatement pour toi.</li></ul><p>Sans réponse, le score est nul. Le total ne descend pas sous zéro. Les années avant J.-C. sont négatives pour le calcul d’écart ; l’année zéro n’est pas proposée. Les dates approximatives visent une année de référence.</p><p>Les joueurs répondent chacun leur tour sur le même appareil. Les autres détournent le regard ; les scores et la bonne réponse sont partagés en fin de manche.</p></dialog>
 <noscript><p class="panel">Active JavaScript pour jouer à TOUT PILE MASTER.</p></noscript>
 </body>
 </html>

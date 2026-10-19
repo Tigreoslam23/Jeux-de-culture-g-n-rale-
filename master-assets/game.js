@@ -6,7 +6,7 @@
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let state='setup',players=[],deck=[],round=0,turn=0,answers=[];
   let entry='',era=1,last=null,bricks=0,startedAt=0,clock=null,expired=false;
-  let epoch=0,pending=new Set(),soundOn=false,audio=null;
+  let epoch=0,pending=new Set(),soundOn=true,audio=null,audioBus=null;
 
   // A screen change invalidates all old animation callbacks and clocks.
   function clearWork(){epoch++;pending.forEach(clearTimeout);pending.clear();if(clock!==null)clearInterval(clock);clock=null;}
@@ -31,10 +31,37 @@
   function playTone(kind){
     if(!soundOn)return;
     try{
-      if(!audio){const Context=window.AudioContext||window.webkitAudioContext;if(!Context)return;audio=new Context();}
+      if(!audio){const Context=window.AudioContext||window.webkitAudioContext;if(!Context)return;audio=new Context();audioBus=audio.createGain();audioBus.gain.value=.45;audioBus.connect(audio.destination);}
       audio.resume().catch(()=>{});
-      const notes=kind==='win'?[523,659,784,1047]:kind==='hit'?[130,65]:kind==='start'?[440,660]:[420];
-      notes.forEach((freq,i)=>{const osc=audio.createOscillator(),gain=audio.createGain(),at=audio.currentTime+i*.09;osc.type=kind==='hit'?'triangle':'sine';osc.frequency.setValueAtTime(freq,at);gain.gain.setValueAtTime(.0001,at);gain.gain.exponentialRampToValueAtTime(.08,at+.01);gain.gain.exponentialRampToValueAtTime(.0001,at+.14);osc.connect(gain);gain.connect(audio.destination);osc.start(at);osc.stop(at+.15);});
+      if(kind==='arrival'){
+        // Bright harmonic brass, a tongued attack and a short ceremonial fanfare.
+        const real=new Float32Array(13),imag=new Float32Array([0,1,.85,.65,.5,.35,.27,.18,.12,.08,.05,.03,.02]);
+        const brass=audio.createPeriodicWave(real,imag);
+        [[523.25,0,.12],[523.25,.16,.12],[659.25,.32,.14],[783.99,.52,.48]].forEach(([freq,offset,length])=>{
+          [1,.5].forEach((octave,voice)=>{
+            const at=audio.currentTime+offset,osc=audio.createOscillator(),gain=audio.createGain(),filter=audio.createBiquadFilter();
+            osc.setPeriodicWave(brass);osc.frequency.setValueAtTime(freq*octave*.985,at);osc.frequency.exponentialRampToValueAtTime(freq*octave,at+.025);
+            filter.type='lowpass';filter.frequency.setValueAtTime(1400,at);filter.frequency.linearRampToValueAtTime(4600,at+.035);filter.frequency.linearRampToValueAtTime(2200,at+length);filter.Q.value=.6;
+            const volume=voice?.1:.23;gain.gain.setValueAtTime(.0001,at);gain.gain.exponentialRampToValueAtTime(volume,at+.018);gain.gain.setValueAtTime(volume*.8,at+length*.75);gain.gain.exponentialRampToValueAtTime(.0001,at+length+.065);
+            osc.connect(filter);filter.connect(gain);gain.connect(audioBus);osc.start(at);osc.stop(at+length+.08);
+          });
+        });
+        return;
+      }
+      if(kind==='hit'){
+        // Comic PAF: a low punch plus a short, filtered burst of noisy air.
+        const at=audio.currentTime,thump=audio.createOscillator(),body=audio.createGain();
+        thump.type='triangle';thump.frequency.setValueAtTime(190,at);thump.frequency.exponentialRampToValueAtTime(48,at+.13);
+        body.gain.setValueAtTime(.0001,at);body.gain.exponentialRampToValueAtTime(.65,at+.005);body.gain.exponentialRampToValueAtTime(.0001,at+.19);
+        thump.connect(body);body.connect(audioBus);thump.start(at);thump.stop(at+.2);
+        const buffer=audio.createBuffer(1,Math.ceil(audio.sampleRate*.18),audio.sampleRate),samples=buffer.getChannelData(0);
+        for(let i=0;i<samples.length;i++)samples[i]=Math.random()*2-1;
+        const noise=audio.createBufferSource(),filter=audio.createBiquadFilter(),puff=audio.createGain();noise.buffer=buffer;filter.type='bandpass';filter.frequency.value=1100;filter.Q.value=.7;
+        puff.gain.setValueAtTime(.8,at);puff.gain.exponentialRampToValueAtTime(.0001,at+.17);noise.connect(filter);filter.connect(puff);puff.connect(audioBus);noise.start(at);noise.stop(at+.18);
+        return;
+      }
+      const notes=kind==='win'?[523,659,784,1047]:[420];
+      notes.forEach((freq,i)=>{const osc=audio.createOscillator(),gain=audio.createGain(),at=audio.currentTime+i*.09;osc.type='sine';osc.frequency.setValueAtTime(freq,at);gain.gain.setValueAtTime(.0001,at);gain.gain.exponentialRampToValueAtTime(.15,at+.01);gain.gain.exponentialRampToValueAtTime(.0001,at+.14);osc.connect(gain);gain.connect(audioBus);osc.start(at);osc.stop(at+.15);});
     }catch(_){/* Sound is optional: an audio error must never stop a turn. */}
   }
   function controls(){
@@ -70,13 +97,13 @@
     $('feedback').className='';$('feedback').textContent='L’histoire attend ta réponse.';
     $('hammer').classList.remove('hit');$('impact').classList.remove('hit');
     $('brick-cost').textContent='0 brique · 0 pt';$('saved-time').textContent='Aucune réponse enregistrée';
-    $('time').textContent='20.0';$('live-points').textContent='10 000';$('time-fill').style.transform='scaleX(1)';
+    $('time').textContent='20.0';$('live-points').textContent='20 000';$('time-fill').style.transform='scaleX(1)';
     $('time-progress').setAttribute('aria-valuenow','0');$('time-progress').classList.remove('urgent');$('watch').classList.remove('urgent');
     $('input-status').textContent='Prépare-toi…';renderEntry();
-    $('event-card').classList.remove('entering');void $('event-card').offsetWidth;$('event-card').classList.add('entering');
+    $('event-card').classList.remove('entering');void $('event-card').offsetWidth;$('event-card').classList.add('entering');playTone('arrival');
     later(()=>{
       $('event-card').classList.remove('entering');state='playing';startedAt=performance.now();
-      $('input-status').textContent='À toi ! Propose une année.';controls();playTone('start');
+      $('input-status').textContent='À toi ! Propose une année.';controls();
       tick();clock=setInterval(tick,40);
     },reduced?150:1400);
   }
@@ -110,17 +137,17 @@
     later(()=>{
       if(exact){finishTurn('exact');return;}
       $('hammer').classList.remove('hit');$('impact').classList.remove('hit');void $('hammer').offsetWidth;
-      $('hammer').classList.add('hit');$('impact').classList.add('hit');$('submitted-year').className='squash';playTone('hit');
+      $('hammer').classList.add('hit');$('impact').classList.add('hit');$('submitted-year').className='squash';later(()=>playTone('hit'),reduced?0:180);
       later(()=>{
         const higher=year<target;bricks++;
         const brick=document.createElement('div');brick.className='brick';brick.textContent=String(Math.abs(year));
-        const detail=document.createElement('small');detail.textContent=year<0?'av. J.-C. · −200':'−200 pts';brick.append(detail);
-        brick.title=`${R.yearText(year)} : c’est ${higher?'plus':'moins'} ! −200 points`;
+        const detail=document.createElement('small');detail.textContent=year<0?'av. J.-C. · −500':'−500 pts';brick.append(detail);
+        brick.title=`${R.yearText(year)} : c’est ${higher?'plus':'moins'} ! −500 points`;
         $(higher?'plus-bricks':'minus-bricks').append(brick);$(higher?'plus-bricks':'minus-bricks').scrollTop=0;
         $('submitted-year').className='';$('submitted-year').textContent=higher?'↗':'↙';
         $('feedback').className=`hint ${higher?'plus':'minus'}`;$('feedback').textContent=higher?'C’EST PLUS !':'C’EST MOINS !';
         $('guess-label').textContent=`APRÈS ${R.yearText(year)}…`;
-        $('brick-cost').textContent=`${bricks} brique${bricks>1?'s':''} · −${fmt(bricks*200)} pts`;
+        $('brick-cost').textContent=`${bricks} brique${bricks>1?'s':''} · −${fmt(bricks*500)} pts`;
         entry='';state='playing';renderEntry();$('input-status').textContent='Un nouvel essai, ou garde ta réponse.';
         if(expired||elapsed()>=R.DURATION)finishTurn('timeout');
       },reduced?30:260);
@@ -149,8 +176,8 @@
     $('tally-title').textContent=a.exact?'Un coup de maître !':a.guess===null?'Le temps a filé !':a.reason==='keep'?'Réponse conservée !':'Temps écoulé !';
     $('tally-description').textContent=a.guess===null?'Aucune année validée : pas de points pour cette manche.':`Dernière proposition : ${R.yearText(a.guess)}. Voici tes points.`;
     $('elapsed-detail').textContent=a.guess===null?'Aucune validation':`figé à ${a.seconds.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})} s`;
-    $('bricks-detail').textContent=`${a.bricks} × −200 pts`;
-    $('gap-detail').textContent=a.gap===null?'Aucune réponse':a.gap===0?'Année exacte : bonus ci-dessous':`${a.gap} an${a.gap>1?'s':''} d’écart${a.gap<=20?` · 5 000 − ${a.gap} × 250`:' · au-delà de 20 ans'}`;
+    $('bricks-detail').textContent=`${a.bricks} × −500 pts`;
+    $('gap-detail').textContent=a.gap===null?'Aucune réponse':a.gap===0?'Année exacte : bonus ci-dessous':`${a.gap} an${a.gap>1?'s':''} d’écart${a.gap<=10?` · 5 000 − ${a.gap} × 500`:' · au-delà de 10 ans'}`;
     countTo('tally-time',a.time,0);countTo('tally-bricks',-a.penalty,220);countTo('tally-gap',a.proximity,440);countTo('tally-exact',a.exact,660);
     $('tally-total').textContent='0';later(()=>{const start=performance.now();const step=()=>{const p=reduced?1:Math.min(1,(performance.now()-start)/420);$('tally-total').textContent=fmt(a.total*(1-Math.pow(1-p,3)));if(p<1)later(step,20);};step();},reduced?0:920);
     $('tally-next').textContent=turn+1<players.length?'Passer au joueur suivant ➜':'Voir le verdict de la manche ➜';
@@ -185,7 +212,7 @@
   $('tally-next').addEventListener('click',()=>{if(state!=='tally')return;turn++;if(turn<players.length)ready();else reveal();});
   $('next-round').addEventListener('click',()=>{if(state!=='round-result')return;round++;turn=0;answers=[];if(round<deck.length)ready();else final();});
   $('again').addEventListener('click',()=>{if(state!=='final')return;state='setup';show('setup');$('begin').focus({preventScroll:true});});
-  $('sound').addEventListener('click',()=>{soundOn=!soundOn;$('sound').textContent=`Son : ${soundOn?'ON':'OFF'}`;$('sound').setAttribute('aria-pressed',String(soundOn));$('sound').title=soundOn?'Désactiver les effets sonores':'Activer les effets sonores';if(soundOn)playTone('key');});
+  $('sound').addEventListener('click',()=>{soundOn=!soundOn;$('sound').textContent=`Son : ${soundOn?'ON':'OFF'}`;$('sound').setAttribute('aria-pressed',String(soundOn));$('sound').title=soundOn?'Désactiver les effets sonores':'Activer les effets sonores';if(audioBus)audioBus.gain.setTargetAtTime(soundOn?.45:0,audio.currentTime,.015);if(soundOn)playTone('key');});
   $('help').addEventListener('click',()=>$('rules-dialog').showModal());
   $('close-rules').addEventListener('click',()=>$('rules-dialog').close());
   $('rules-dialog').addEventListener('click',e=>{if(e.target===$('rules-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}});
