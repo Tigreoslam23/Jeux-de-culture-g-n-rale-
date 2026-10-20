@@ -12,7 +12,7 @@ La version classique (`index.html`) est conservée sans modification.
 
 ## TOUT PILE MASTER — La bataille des années
 
-256 événements de la version classique, les mêmes noms de joueurs à saisir (1 à 8), et 3, 5, 8 ou 12 manches. Les participants jouent à tour de rôle sur un même appareil. Les autres détournent le regard pendant chaque tour ; la réponse et le tableau des scores sont révélés après le passage de toute la troupe. Le jeu ne synchronise pas plusieurs appareils sur Discord.
+Le menu propose deux modes : **Solo**, pour un défi personnel avec un nom facultatif, et **À plusieurs**, pour 2 à 8 joueurs avec l’encart des noms conservé. Les noms saisis restent en place quand on change de mode. Les deux modes utilisent les 256 événements de la version classique et permettent 3, 5, 8 ou 12 manches. En mode À plusieurs, les participants jouent à tour de rôle sur un même appareil. Les autres détournent le regard pendant chaque tour ; la réponse et le tableau des scores sont révélés après le passage de toute la troupe. Le jeu ne synchronise pas plusieurs appareils sur Discord.
 
 L’événement arrive en dérapage (1,4 seconde), puis le chronomètre illustré démarre pour 20 secondes. Un pavé numérique permet de proposer une année : le marteau donne « C’est PLUS ! » si la réponse est plus tardive, « C’est MOINS ! » si elle est antérieure. Les briques gardent la trace des propositions, à droite pour PLUS et à gauche pour MOINS. Une réponse exacte termine immédiatement le tour avec une animation TOUT PILE.
 
@@ -39,7 +39,7 @@ Ouvrir `tout-pile-master.html` avec le dossier `master-assets/` à côté. Tout 
 
 La réduction des animations du système est respectée. Le son est activé par défaut après le clic du joueur : fanfare de trompettes synthétisées pendant l’arrivée de l’événement, et « PAF ! » percussif avec le marteau. Le bouton Son permet de le couper à tout moment. Souris, tactile ou clavier : chiffres, Entrée pour valider, Retour arrière pour corriger, Échap pour effacer, − / + pour changer d’ère.
 
-Vérifications : `node tests/master.test.cjs` couvre le score, les 256 événements, les contrôles, les briques, les réponses au voisinage de l’échéance, les années avant J.-C., le mode de mouvement réduit et une partie complète à deux joueurs. Il s’agit de tests de logique avec simulation du DOM et du temps ; ils ne remplacent pas une validation visuelle dans un navigateur.
+Vérifications : `node tests/master.test.cjs` couvre le score, les 256 événements, les contrôles, les briques, les réponses au voisinage de l’échéance, les années avant J.-C., le mode de mouvement réduit et des parties complètes en solo et à deux joueurs, avec le changement de mode. Il s’agit de tests de logique avec simulation du DOM et du temps ; ils ne remplacent pas une validation visuelle dans un navigateur.
 
 ---
 

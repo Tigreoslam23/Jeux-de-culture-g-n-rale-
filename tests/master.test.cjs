@@ -58,9 +58,27 @@ function fixture(target=1789,reduced=false,withAudio=false){
   const key=k=>{const event={key:k,preventDefault(){},ctrlKey:false,altKey:false,metaKey:false};for(const fn of doc.listeners.keydown||[])fn(event);};
   const enter=value=>{key('Escape');for(const d of String(Math.abs(value)))key(d);click(value<0?'bce':'ce');};
   const mouse=k=>{const e=keys.find(x=>x.dataset.key===k);assert(e);if(!e.disabled)for(const fn of els.keypad.listeners.click)fn({target:e});};
-  const start=(names='Alice')=>{els.players.value=names;els['round-count'].value='3';click('begin');click('launch');};
+  const start=(names='Alice')=>{const multi=names.includes('\n');click(multi?'mode-multi':'mode-solo');els[multi?'players':'solo-name'].value=names;els['round-count'].value='3';click('begin');click('launch');};
   const shown=id=>!els[id].hidden;
   return {els,advance,click,key,enter,mouse,start,shown,audioNodes};
+}
+// Mode selection preserves both name fields; multiplayer requires at least two names.
+{
+  const f=fixture();assert.equal(f.els['mode-solo'].attributes['aria-pressed'],'true');assert(f.els['multi-fields'].hidden);
+  f.els['solo-name'].value='Camille';f.click('mode-multi');assert(!f.els['multi-fields'].hidden);assert(f.els['solo-fields'].hidden);
+  f.els.players.value='Alice';f.click('begin');assert(f.els['setup-error'].textContent.includes('2 à 8'));
+  f.els.players.value='Alice\nBob';f.click('mode-solo');assert.equal(f.els['solo-name'].value,'Camille');assert.equal(f.els.players.value,'Alice\nBob');
+  f.els['solo-name'].value='';f.els['round-count'].value='3';f.click('begin');assert(f.shown('ready'));assert.equal(f.els['ready-name'].textContent,'À toi, Joueur solo !');assert(!f.els['ready-instructions'].textContent.includes('autres'));
+}
+// Full solo game has one answer per round, personal total and no private handoff.
+{
+  const f=fixture(1789,true);f.start('Camille');
+  for(let round=0;round<3;round++){
+    if(round)f.click('launch');f.advance(150);f.enter(1789);f.click('submit');f.advance(1000);
+    assert(f.shown('tally'));assert(f.els['tally-privacy'].hidden);f.click('tally-next');
+    assert(f.shown('round-result'));assert.equal(f.els['round-body'].children.length,1);f.click('next-round');
+  }
+  assert(f.shown('final'));assert(f.els['final-title'].textContent.includes((75000).toLocaleString('fr-FR')));assert.equal(f.els.leaderboard.children.length,1);f.click('again');f.click('mode-multi');assert(!f.els['multi-fields'].hidden);
 }
 // Fanfare begins during the entrance; hammer adds a noise burst; mute is immediate.
 {

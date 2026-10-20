@@ -5,6 +5,7 @@
   const fmt=n=>(Math.round(n)||0).toLocaleString('fr-FR');
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let state='setup',players=[],deck=[],round=0,turn=0,answers=[];
+  let playMode='solo';
   let entry='',era=1,last=null,bricks=0,startedAt=0,clock=null,expired=false;
   let epoch=0,pending=new Set(),soundOn=true,audio=null,audioBus=null;
 
@@ -83,13 +84,22 @@
   }
   function ready(){
     state='ready';show('ready','ready-name');
-    $('ready-progress').textContent=`Manche ${round+1} / ${deck.length} · Joueur ${turn+1} / ${players.length}`;
+    $('ready-progress').textContent=progressLabel();
     $('ready-name').textContent=`À toi, ${players[turn].name} !`;
+    $('ready-instructions').textContent=playMode==='solo'?'Un événement, vingt secondes : à toi de viser juste !':'Les autres joueurs détournent le regard. Le même événement attend toute la troupe.';
+  }
+  function progressLabel(){return `Manche ${round+1} / ${deck.length} · ${playMode==='solo'?'Solo':`Joueur ${turn+1} / ${players.length}`}`;}
+  function chooseMode(mode){
+    if(state!=='setup')return;playMode=mode;const solo=mode==='solo';
+    $('mode-solo').setAttribute('aria-pressed',String(solo));$('mode-multi').setAttribute('aria-pressed',String(!solo));
+    $('solo-fields').hidden=!solo;$('multi-fields').hidden=solo;
+    $('mode-description').textContent=solo?'Seul face à l’histoire : vise le meilleur score !':'Un même écran, chacun son tour. Que le meilleur gagne !';
+    $('begin').textContent=solo?'Lancer mon défi ➜':'Lancer la partie ➜';$('setup-error').textContent='';
   }
   function launch(){
     if(state!=='ready')return;
     show('game');state='entering';last=null;bricks=0;entry='';era=1;expired=false;
-    $('game-progress').textContent=`Manche ${round+1} / ${deck.length} · Joueur ${turn+1} / ${players.length}`;
+    $('game-progress').textContent=progressLabel();
     $('game-player').textContent=players[turn].name;
     $('event-title').textContent=questionTitle(deck[round]);$('approx-note').hidden=!deck[round].approx;
     $('plus-bricks').replaceChildren();$('minus-bricks').replaceChildren();
@@ -172,6 +182,7 @@
   }
   function showTally(a){
     state='tally';show('tally','tally-title');
+    $('tally-privacy').hidden=playMode==='solo';
     $('tally-kicker').textContent=`${players[a.player].name} · Manche ${round+1}`;
     $('tally-title').textContent=a.exact?'Un coup de maître !':a.guess===null?'Le temps a filé !':a.reason==='keep'?'Réponse conservée !':'Temps écoulé !';
     $('tally-description').textContent=a.guess===null?'Aucune année validée : pas de points pour cette manche.':`Dernière proposition : ${R.yearText(a.guess)}. Voici tes points.`;
@@ -185,24 +196,29 @@
   function cell(row,text){const td=document.createElement('td');td.textContent=text;row.append(td);}
   function reveal(){
     state='round-result';show('round-result','reveal-heading');const event=deck[round];
-    $('reveal-progress').textContent=`Manche ${round+1} / ${deck.length} · Tous les joueurs ont répondu`;
+    $('reveal-progress').textContent=`Manche ${round+1} / ${deck.length} · ${playMode==='solo'?'Ton résultat':'Tous les joueurs ont répondu'}`;
     $('reveal-event').textContent=event.title;$('reveal-year').textContent=(event.approx?'Vers ':'')+R.yearText(event.date[0]);
     $('event-source').href=event.url;$('event-source').textContent=`Consulter ${event.sourceLabel||'la source historique'} ↗`;
     $('round-body').replaceChildren();
     [...answers].sort((a,b)=>b.total-a.total).forEach(a=>{const tr=document.createElement('tr');cell(tr,players[a.player].name);cell(tr,a.guess===null?'—':R.yearText(a.guess));cell(tr,a.gap===null?'—':a.gap===0?'TOUT PILE !':`${a.gap} an${a.gap>1?'s':''}`);cell(tr,fmt(a.total));cell(tr,fmt(players[a.player].score));$('round-body').append(tr);});
-    $('next-round').textContent=round+1===deck.length?'Le classement final ➜':'Manche suivante ➜';
+    $('next-round').textContent=round+1===deck.length?(playMode==='solo'?'Mon bilan final ➜':'Le classement final ➜'):'Manche suivante ➜';
   }
   function final(){
     state='final';show('final','final-title');const order=[...players].sort((a,b)=>b.score-a.score),winners=order.filter(p=>p.score===order[0].score);
+    $('final-kicker').textContent=playMode==='solo'?'TU AS ÉCRIT L’HISTOIRE':'LA TROUPE A ÉCRIT L’HISTOIRE';
     $('final-title').textContent=players.length===1?`${fmt(order[0].score)} points. Bien joué !`:winners.length>1?'Victoire partagée !':`${order[0].name}, quel panache !`;
     $('leaderboard').replaceChildren();let rank=1;
     order.forEach((p,i)=>{if(i===0||p.score!==order[i-1].score)rank=i+1;const row=document.createElement('div');row.className='leader';const place=document.createElement('b');place.textContent=String(rank).padStart(2,'0');const name=document.createElement('span');name.textContent=p.name;const points=document.createElement('strong');points.textContent=`${fmt(p.score)} pts`;row.append(place,name,points);$('leaderboard').append(row);});
   }
   $('begin').addEventListener('click',()=>{
-    if(state!=='setup')return;const names=R.parseNames($('players').value);
-    if(!names){$('setup-error').textContent='Indique de 1 à 8 noms différents, un par ligne.';return;}
+    if(state!=='setup')return;
+    const names=playMode==='solo'?[$('solo-name').value.trim()||'Joueur solo']:R.parseNames($('players').value);
+    if(!names||(playMode==='multi'&&names.length<2)){$('setup-error').textContent='Indique de 2 à 8 noms différents, un par ligne.';return;}
     $('setup-error').textContent='';players=names.map(name=>({name,score:0}));deck=pickEvents(Number($('round-count').value));round=0;turn=0;answers=[];ready();
   });
+  $('mode-solo').addEventListener('click',()=>chooseMode('solo'));
+  $('mode-multi').addEventListener('click',()=>chooseMode('multi'));
+  chooseMode('solo');
   $('launch').addEventListener('click',launch);
   $('keypad').addEventListener('click',e=>{const b=e.target.closest('button[data-key]');if(b)input(b.dataset.key);});
   $('ce').addEventListener('click',()=>{if(state==='playing'){era=1;renderEntry();}});
