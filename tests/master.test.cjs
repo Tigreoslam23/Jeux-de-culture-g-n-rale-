@@ -6,18 +6,16 @@ const html=fs.readFileSync(path.join(root,'tout-pile-master.html'),'utf8');
 const js=fs.readFileSync(path.join(root,'master-assets/game.js'),'utf8');
 assert.equal(events.length,256);assert.equal(new Set(events.map(e=>e.title)).size,256);
 for(const e of events){assert(Number.isInteger(e.date[0]));assert.notEqual(e.date[0],0);assert(e.url);}
-assert.equal(R.timePoints(0),20000);assert.equal(R.timePoints(10),6875);assert.equal(R.timePoints(20),5000);
-assert.equal(R.timePoints(5),11328);assert.equal(R.timePoints(-1),20000);assert.equal(R.timePoints(21),5000);
-for(let t=1;t<=200;t++)assert(R.timePoints(t/10)<=R.timePoints((t-1)/10));
-assert(20000-R.timePoints(5)>R.timePoints(5)-R.timePoints(10));
-assert.deepEqual(R.score(1789,1789,4,0),{time:12680,penalty:0,gap:0,proximity:0,exact:5000,total:17680});
-assert.equal(R.score(1788,1789,4,1).total,16680);
-assert.equal(R.score(1779,1789,20,1).proximity,0);
-assert.equal(R.score(1778,1789,20,1).proximity,0);
-assert.equal(R.score(1780,1789,20,1).proximity,500);
+assert.equal(R.timePoints(0),20000);assert.equal(R.timePoints(5),20000);
+assert.equal(R.timePoints(10),18500);assert.equal(R.timePoints(65),2000);
+assert.equal(R.timePoints(-1),20000);assert.equal(R.timePoints(90),2000);
+assert.deepEqual(R.score(1789,1789,4,0),{time:20000,penalty:0,gap:0,proximity:0,exact:6000,total:26000});
+assert.equal(R.score(1788,1789,4,1).total,24000);
+assert.equal(R.score(1780,1789,65,1).proximity,500);
+assert.equal(R.score(1779,1789,65,1).proximity,0);
 assert.equal(R.score(-53,-52,0,1).gap,1);
-assert.equal(R.score(null,1789,20,0).total,0);
-assert.equal(R.score(1000,1789,20,30).total,0);
+assert.equal(R.score(null,1789,65,0).total,0);
+assert.equal(R.score(1000,1789,65,30).total,0);
 assert.equal(R.parseNames('Alice\nalice'),null);assert.equal(R.parseNames(' '),null);
 assert.equal(R.parseNames(Array(9).fill(0).map((_,i)=>i).join('\n')),null);
 assert.deepEqual(R.parseNames(' Alice ; Bob\nChloé '),['Alice','Bob','Chloé']);
@@ -78,7 +76,7 @@ function fixture(target=1789,reduced=false,withAudio=false){
     assert(f.shown('tally'));assert(f.els['tally-privacy'].hidden);f.click('tally-next');
     assert(f.shown('round-result'));assert.equal(f.els['round-body'].children.length,1);f.click('next-round');
   }
-  assert(f.shown('final'));assert(f.els['final-title'].textContent.includes((75000).toLocaleString('fr-FR')));assert.equal(f.els.leaderboard.children.length,1);f.click('again');f.click('mode-multi');assert(!f.els['multi-fields'].hidden);
+  assert(f.shown('final'));assert(f.els['final-title'].textContent.includes((78000).toLocaleString('fr-FR')));assert.equal(f.els.leaderboard.children.length,1);f.click('again');f.click('mode-multi');assert(!f.els['multi-fields'].hidden);
 }
 // Fanfare begins during the entrance; hammer adds a noise burst; mute is immediate.
 {
@@ -93,9 +91,9 @@ function fixture(target=1789,reduced=false,withAudio=false){
 }
 // Intro is not charged; mouse and keyboard both work; exact answer stops the clock.
 {
-  const f=fixture();f.start();assert(f.els.submit.disabled);f.advance(1399);assert.equal(f.els.time.textContent,'20.0');f.advance(1);
+  const f=fixture();f.start();assert(f.els.submit.disabled);f.advance(1399);assert.equal(f.els.time.textContent,'65.0');f.advance(1);
   f.mouse('1');f.mouse('7');f.mouse('8');f.mouse('9');assert.equal(f.els.entry.textContent,'1789');f.advance(4000);f.click('submit');f.click('submit');f.advance(2200);
-  assert(f.shown('tally'));f.advance(1600);assert.equal(f.els['tally-total'].textContent,(17680).toLocaleString('fr-FR'));assert.equal(f.els['tally-bricks'].textContent,'0');
+  assert(f.shown('tally'));f.advance(1600);assert.equal(f.els['tally-total'].textContent,(26000).toLocaleString('fr-FR'));assert.equal(f.els['tally-bricks'].textContent,'0');
 }
 // Wrong answers stack on the correct side; keep retains last submission time.
 {
@@ -107,16 +105,16 @@ function fixture(target=1789,reduced=false,withAudio=false){
 }
 // A wrong guess accepted before the deadline finishes its animation and is scored once.
 {
-  const f=fixture();f.start();f.advance(1400+19950);f.enter(1788);f.click('submit');f.advance(900);assert(f.shown('tally'));assert.equal(f.els['bricks-detail'].textContent,'1 × −500 pts');f.advance(1600);assert.equal(f.els['tally-total'].textContent,R.score(1788,1789,19.95,1).total.toLocaleString('fr-FR'));
+  const f=fixture();f.start();f.advance(1400+64950);f.enter(1000);f.click('submit');f.advance(900);assert(f.shown('tally'));assert.equal(f.els['bricks-detail'].textContent,'1 × −500 pts');f.advance(1600);assert.equal(f.els['tally-total'].textContent,R.score(1000,1789,64.95,1).total.toLocaleString('fr-FR'));
 }
 // An exact answer just before zero still wins; an answer at/after zero is rejected.
 {
-  const f=fixture();f.start();f.advance(1400+19990);f.enter(1789);f.click('submit');f.advance(3800);assert(f.shown('tally'));assert.equal(f.els['tally-exact'].textContent,'+ '+(5000).toLocaleString('fr-FR'));
-  const g=fixture();g.start();g.advance(1400+20000);g.enter(1789);g.click('submit');g.advance(1500);assert(g.shown('tally'));assert.equal(g.els['tally-total'].textContent,'0');
+  const f=fixture();f.start();f.advance(1400+64990);f.enter(1789);f.click('submit');f.advance(3800);assert(f.shown('tally'));assert.equal(f.els['tally-exact'].textContent,'+ '+(6000).toLocaleString('fr-FR'));
+  const g=fixture();g.start();g.advance(1400+65000);g.enter(1789);g.click('submit');g.advance(1500);assert(g.shown('tally'));assert.equal(g.els['tally-total'].textContent,'0');
 }
 // BCE and reduced-motion mode. No year zero, duplicate guess has no extra penalty.
 {
-  const f=fixture(-52,true);f.start();f.advance(150);f.mouse('0');assert(f.els.submit.disabled);f.enter(-53);f.click('submit');f.advance(80);assert.equal(f.els.feedback.textContent,'C’EST PLUS !');f.enter(-53);f.click('submit');f.advance(100);assert.equal(f.els['plus-bricks'].children.length,1);f.enter(-52);f.click('submit');f.advance(1000);assert(f.shown('tally'));assert.equal(f.els['tally-exact'].textContent,'+ '+(5000).toLocaleString('fr-FR'));
+  const f=fixture(-52,true);f.start();f.advance(150);f.mouse('0');assert(f.els.submit.disabled);f.enter(-53);f.click('submit');f.advance(80);assert.equal(f.els.feedback.textContent,'C’EST PLUS !');f.enter(-53);f.click('submit');f.advance(100);assert.equal(f.els['plus-bricks'].children.length,1);f.enter(-52);f.click('submit');f.advance(1000);assert(f.shown('tally'));assert.equal(f.els['tally-exact'].textContent,'+ '+(6000).toLocaleString('fr-FR'));
 }
 // A complete 2-player, 3-round game: private handoffs, reveal, totals, shared win, restart.
 {
@@ -128,6 +126,28 @@ function fixture(target=1789,reduced=false,withAudio=false){
     }
     assert(f.shown('round-result'));assert.equal(f.els['round-body'].children.length,2);f.click('next-round');
   }
-  assert(f.shown('final'));assert.equal(f.els['final-title'].textContent,'Victoire partagée !');assert.equal(f.els.leaderboard.children.length,2);assert(f.els.leaderboard.children[0].textContent.includes((75000).toLocaleString('fr-FR')));f.click('again');assert(f.shown('setup'));
+  assert(f.shown('final'));assert.equal(f.els['final-title'].textContent,'Victoire partagée !');assert.equal(f.els.leaderboard.children.length,2);assert(f.els.leaderboard.children[0].textContent.includes((78000).toLocaleString('fr-FR')));f.click('again');assert(f.shown('setup'));
 }
-console.log('PASS: cubic scoring and proximity boundaries, trumpet/impact audio scheduling and mute, 256 events, name validation, intro timing, mouse/keyboard, bricks, keep, timeout races, BCE, reduced motion, full multiplayer game, ties and restart.');
+console.log('PASS: linear scoring and proximity boundaries, trumpet/impact audio scheduling and mute, 256 events, name validation, intro timing, mouse/keyboard, bricks, keep, timeout races, BCE, reduced motion, full multiplayer game, ties and restart.');
+
+// Proximity pauses accumulate once per threshold, without jumping the clock back.
+{
+ const f=fixture(1789,true);f.start();f.advance(150+10000);
+ f.enter(1700);f.click('submit');f.advance(80);
+ assert.equal(f.els.time.textContent,'55.0');assert(f.els['bonus-status'].textContent.includes('+3 s'));
+ f.advance(3200);assert(Number(f.els.time.textContent)<55);
+ f.enter(1770);f.click('submit');f.advance(80);
+ assert(f.els['bonus-status'].textContent.includes('+4 s'));
+ assert.equal(f.els['plus-bricks'].children.length,1);assert.equal(f.els['plus-count'].textContent,'+ : 2');
+ f.enter(1785);f.click('submit');f.advance(80);assert(f.els['bonus-status'].textContent.includes('+5 s'));
+ f.enter(1786);f.click('submit');f.advance(80);assert.equal(f.els['plus-count'].textContent,'+ : 4');
+ f.advance(9000);assert(f.els['pause-status'].textContent.includes('−300'));
+}
+// Direct entry into the closest zone grants all twelve seconds; a new turn resets them.
+{
+ const f=fixture(1789,true);f.start();f.advance(150+64950);f.enter(1788);f.click('submit');f.advance(80);
+ assert(f.shown('game'));assert(f.els['bonus-status'].textContent.includes('+12 s'));
+ f.advance(11900);assert(f.shown('game'));f.advance(120);assert(f.shown('tally'));
+ f.click('tally-next');f.click('next-round');f.click('launch');f.advance(150);
+ assert.equal(f.els['plus-count'].textContent,'+ : 0');assert.equal(f.els.time.textContent,'65.0');
+}

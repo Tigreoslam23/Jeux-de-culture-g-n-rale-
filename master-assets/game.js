@@ -7,6 +7,7 @@
   let state='setup',players=[],deck=[],round=0,turn=0,answers=[];
   let playMode='solo';
   let entry='',era=1,last=null,bricks=0,startedAt=0,clock=null,expired=false;
+  let pauseTotal=0,pauseUntil=0,reached=new Set(),sideCounts={plus:0,minus:0};
   let epoch=0,pending=new Set(),soundOn=true,audio=null,audioBus=null;
 
   // A screen change invalidates all old animation callbacks and clocks.
@@ -86,7 +87,7 @@
     state='ready';show('ready','ready-name');
     $('ready-progress').textContent=progressLabel();
     $('ready-name').textContent=`À toi, ${players[turn].name} !`;
-    $('ready-instructions').textContent=playMode==='solo'?'Un événement, vingt secondes : à toi de viser juste !':'Les autres joueurs détournent le regard. Le même événement attend toute la troupe.';
+    $('ready-instructions').textContent=playMode==='solo'?'Un événement, 65 secondes et des pauses bonus : à toi de viser juste !':'Les autres joueurs détournent le regard. Le même événement attend toute la troupe.';
   }
   function progressLabel(){return `Manche ${round+1} / ${deck.length} · ${playMode==='solo'?'Solo':`Joueur ${turn+1} / ${players.length}`}`;}
   function chooseMode(mode){
@@ -98,7 +99,8 @@
   }
   function launch(){
     if(state!=='ready')return;
-    show('game');state='entering';last=null;bricks=0;entry='';era=1;expired=false;
+    show('game');state='entering';last=null;bricks=0;entry='';era=1;expired=false;pauseTotal=0;pauseUntil=0;reached=new Set();sideCounts={plus:0,minus:0};
+    $('plus-count').textContent='+ : 0';$('minus-count').textContent='− : 0';$('pause-status').textContent='5 secondes pour lire, puis −300 pts/s';
     $('game-progress').textContent=progressLabel();
     $('game-player').textContent=players[turn].name;
     $('event-title').textContent=questionTitle(deck[round]);$('approx-note').hidden=!deck[round].approx;
@@ -107,9 +109,9 @@
     $('feedback').className='';$('feedback').textContent='L’histoire attend ta réponse.';
     $('hammer').classList.remove('hit');$('impact').classList.remove('hit');
     $('brick-cost').textContent='0 brique · 0 pt';$('saved-time').textContent='Aucune réponse enregistrée';
-    $('time').textContent='20.0';$('live-points').textContent='20 000';$('time-fill').style.transform='scaleX(1)';
+    $('time').textContent='65.0';$('live-points').textContent='20 000';$('time-fill').style.transform='scaleX(1)';
     $('time-progress').setAttribute('aria-valuenow','0');$('time-progress').classList.remove('urgent');$('watch').classList.remove('urgent');
-    $('input-status').textContent='Prépare-toi…';renderEntry();
+    $('bonus-status').textContent='Bonus disponibles : ±100 ans · ±20 ans · ±5 ans';$('input-status').textContent='Prépare-toi…';renderEntry();
     $('event-card').classList.remove('entering');void $('event-card').offsetWidth;$('event-card').classList.add('entering');playTone('arrival');
     later(()=>{
       $('event-card').classList.remove('entering');state='playing';startedAt=performance.now();
@@ -117,10 +119,19 @@
       tick();clock=setInterval(tick,40);
     },reduced?150:1400);
   }
-  function elapsed(){return Math.min(R.DURATION,Math.max(0,(performance.now()-startedAt)/1000));}
+  function elapsed(){const now=performance.now();return Math.min(R.DURATION,Math.max(0,(now-startedAt)/1000-pauseTotal+Math.max(0,(pauseUntil-now)/1000)));}
+  function proximityPause(gap){
+    const earned=R.THRESHOLDS.filter(t=>gap<=t.gap&&!reached.has(t.gap));
+    if(!earned.length)return;
+    const seconds=earned.reduce((sum,t)=>sum+t.seconds,0);
+    earned.forEach(t=>reached.add(t.gap));
+    pauseTotal+=seconds;pauseUntil=Math.max(performance.now(),pauseUntil)+seconds*1000;
+    $('bonus-status').textContent=`À ${earned[earned.length-1].gap} ans ou moins ! +${seconds} s de répit`;
+  }
   function tick(){
     if(state!=='playing'&&state!=='animating')return;
-    const e=elapsed(),left=Math.max(0,R.DURATION-e);
+    const e=elapsed(),pauseLeft=Math.max(0,(pauseUntil-performance.now())/1000),left=Math.max(0,R.DURATION-e);
+    $('pause-status').textContent=pauseLeft>0?`Chrono en pause · ${Math.ceil(pauseLeft)} s de répit`:e<5?`Lecture · ${Math.ceil(5-e)} s avant la baisse`:'−300 pts/s · plancher à 2 000 pts';
     $('time').textContent=(Math.ceil(left*10)/10).toFixed(1);
     $('live-points').textContent=fmt(R.timePoints(e));$('time-fill').style.transform=`scaleX(${left/R.DURATION})`;
     $('time-progress').setAttribute('aria-valuenow',e.toFixed(1));
@@ -135,6 +146,7 @@
     const year=Number(entry)*era;
     if(last&&last.year===year){$('input-status').textContent='Cette année est déjà enregistrée. Ajuste-la ou garde ta réponse.';return;}
     const target=deck[round].date[0],exact=year===target;
+    if(!exact)proximityPause(Math.abs(year-target));
     last={year,seconds};state='animating';controls();
     $('guess-label').textContent='TA PROPOSITION';$('submitted-year').className='';
     $('submitted-year').textContent=String(Math.abs(year));
@@ -153,7 +165,10 @@
         const brick=document.createElement('div');brick.className='brick';brick.textContent=String(Math.abs(year));
         const detail=document.createElement('small');detail.textContent=year<0?'av. J.-C. · −500':'−500 pts';brick.append(detail);
         brick.title=`${R.yearText(year)} : c’est ${higher?'plus':'moins'} ! −500 points`;
-        $(higher?'plus-bricks':'minus-bricks').append(brick);$(higher?'plus-bricks':'minus-bricks').scrollTop=0;
+        const side=higher?'plus':'minus',tower=$(side+'-bricks'),previous=tower.children[0];
+        sideCounts[side]++;$(side+'-count').textContent=`${higher?'+':'−'} : ${sideCounts[side]}`;
+        if(previous){previous.classList.add('crushed');later(()=>previous.remove(),reduced?0:240);}
+        tower.append(brick);
         $('submitted-year').className='';$('submitted-year').textContent=higher?'↗':'↙';
         $('feedback').className=`hint ${higher?'plus':'minus'}`;$('feedback').textContent=higher?'C’EST PLUS !':'C’EST MOINS !';
         $('guess-label').textContent=`APRÈS ${R.yearText(year)}…`;

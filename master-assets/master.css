@@ -18,3 +18,9 @@
 
 /* Menu : choix solo / multijoueur. */
 .play-mode-picker{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0 15px}.play-mode-picker button{border:var(--line);border-radius:8px;background:#eee4fd;padding:13px 8px;text-align:left;box-shadow:2px 3px 0 var(--ink)}.play-mode-picker strong{display:block;font-size:19px;line-height:1.25}.play-mode-picker span{display:block;font-size:11px;margin-top:4px}.play-mode-picker button[aria-pressed=true]{background:var(--teal);box-shadow:3px 4px 0 var(--ink)}.play-mode-picker button[aria-pressed=false]:hover{background:#e2d1f8}.setup-card>.mode-description{font-size:12px;margin-bottom:17px;min-height:36px}#solo-name{font:inherit;width:100%;border:2px solid var(--ink);border-radius:7px;background:#fffef8;padding:12px 15px;margin:9px 0 20px;min-height:48px;color:var(--ink)}#solo-name:focus-visible{outline:3px solid #ee8d2d;outline-offset:4px}
+
+/* One dated brick per side, with a brief crush on replacement. */
+.brick-tower{min-width:0;overflow:hidden}.brick-tower .bricks{position:relative;display:block;height:100px;overflow:hidden;padding:8px 4px}.brick-tower .brick{position:absolute;top:10px;left:4px;right:4px;width:auto;margin:0;transform:none;animation:chrono-brick .24s ease-out}.brick-tower .brick.crushed{animation:chrono-crush .24s ease-in forwards;pointer-events:none}.side-count{display:block;font-size:18px;margin:5px 0}.pause-status,.bonus-status{text-align:center;font-size:12px;min-height:20px;padding:3px 8px}.bonus-status{font-weight:bold;color:var(--ink)}
+@keyframes chrono-crush{to{transform:translateY(40px) scaleY(.08);opacity:0}}
+@keyframes chrono-brick{from{transform:translateY(-45px)}to{transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.brick-tower .brick,.brick-tower .brick.crushed{animation:none}}

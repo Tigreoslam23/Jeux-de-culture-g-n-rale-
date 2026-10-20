@@ -6,28 +6,28 @@ Des jeux pour jouer en famille ou avec des amis. Le premier jeu proposé est **T
 ## Les deux versions
 
 - [Jouer à TOUT PILE classique](https://tigreoslam23.github.io/Jeux-de-culture-g-n-rale-/) — dates au jour, au mois ou à l’année.
-- [Jouer à TOUT PILE MASTER](https://tigreoslam23.github.io/Jeux-de-culture-g-n-rale-/tout-pile-master.html) — années, indices plus / moins et univers de BD historique.
+- [Jouer à TOUT PILE CHRONO](https://tigreoslam23.github.io/Jeux-de-culture-g-n-rale-/tout-pile-master.html) — années, indices plus / moins et univers de BD historique.
 
 La version classique (`index.html`) est conservée sans modification.
 
-## TOUT PILE MASTER — La bataille des années
+## TOUT PILE CHRONO — La bataille des années
 
 Le menu propose deux modes : **Solo**, pour un défi personnel avec un nom facultatif, et **À plusieurs**, pour 2 à 8 joueurs avec l’encart des noms conservé. Les noms saisis restent en place quand on change de mode. Les deux modes utilisent les 256 événements de la version classique et permettent 3, 5, 8 ou 12 manches. En mode À plusieurs, les participants jouent à tour de rôle sur un même appareil. Les autres détournent le regard pendant chaque tour ; la réponse et le tableau des scores sont révélés après le passage de toute la troupe. Le jeu ne synchronise pas plusieurs appareils sur Discord.
 
-L’événement arrive en dérapage (1,4 seconde), puis le chronomètre illustré démarre pour 20 secondes. Un pavé numérique permet de proposer une année : le marteau donne « C’est PLUS ! » si la réponse est plus tardive, « C’est MOINS ! » si elle est antérieure. Les briques gardent la trace des propositions, à droite pour PLUS et à gauche pour MOINS. Une réponse exacte termine immédiatement le tour avec une animation TOUT PILE.
+L’événement arrive en dérapage (1,4 seconde), puis le chronomètre démarre pour 65 secondes : 5 secondes sans perte et 60 secondes de baisse régulière. Le pavé numérique, les indices PLUS / MOINS, les sons, le solo et le multijoueur sont conservés. Une seule brique datée reste visible de chaque côté ; la suivante écrase la précédente. Chaque côté possède son compteur de pénalités.
 
-### Score MASTER
+### Score CHRONO
 
-- Points du chrono : `arrondi(5000 + 15000 × (1 − secondes / 20)³)`, avec les secondes entre 0 et 20. La chute est rapide au début : 20 000 au départ, environ 11 328 à 5 s, 6 875 à 10 s et 5 000 à 20 s. La valeur retenue est celle de la **dernière validation**, même si le joueur attend ensuite la fin du chrono.
-- Chaque mauvaise proposition validée, y compris la première, produit une brique : **−500 points**. Une répétition consécutive de la même année n’est pas acceptée et ne coûte rien.
-- Écart absolu entre la dernière année proposée et la bonne année. Pour un écart de 1 à 10 ans : `5000 − 500 × écart`. Au-delà : 0 point de proximité.
-- Tout pile : **+5000 points**, à la place du bonus de proximité.
-- Total : `max(0, chrono − briques + proximité + bonus tout pile)`. Sans proposition validée : 0.
-- « Garder ma réponse » termine le tour avec la dernière proposition enregistrée. À l’expiration du chrono, cette dernière proposition est également conservée.
+- Chrono : `max(2000, 20000 − 300 × max(0, secondes actives − 5))`. La valeur retenue est celle de la dernière validation.
+- Chaque mauvaise proposition validée coûte **500 points**. Une répétition consécutive de la même année est refusée sans pénalité.
+- Premier essai à **100 ans ou moins : 3 s de pause**, à **20 ans ou moins : 4 s**, à **5 ans ou moins : 5 s**. Une seule fois par seuil et par tour ; les bonus se cumulent (12 s si le premier essai est à 5 ans ou moins). Le joueur peut continuer à saisir pendant la pause ; ni le chrono ni ses points ne diminuent. Les animations d’impact utilisent ce même temps.
+- Écart de 1 à 10 ans : `5000 − 500 × écart`. Au-delà : aucun bonus de proximité.
+- Année exacte : **+6000 points**, à la place du bonus de proximité ; fin immédiate du tour.
+- Total : `max(0, chrono − pénalités + proximité + bonus exact)`. Le plancher de 2000 concerne uniquement le chrono ; les pénalités peuvent amener le total à zéro. Sans validation : zéro.
 
-Exemples : tout pile à 4 secondes sans brique = **17680 points** ; à un an près à 4 secondes avec une brique = **16680 points**. Les années avant J.-C. sont négatives dans le calcul de l’écart ; aucune année zéro ne peut être saisie.
+L’URL historique `tout-pile-master.html` reste valable. La version classique `index.html` est inchangée, ainsi que les 256 événements, leurs sources et les illustrations.
 
-### Fichiers MASTER et personnalisation
+### Fichiers CHRONO et personnalisation
 
 Ouvrir `tout-pile-master.html` avec le dossier `master-assets/` à côté. Tout fonctionne sans serveur applicatif, ni bibliothèque distante. Sur GitHub Pages, les fichiers sont servis tels quels.
 
